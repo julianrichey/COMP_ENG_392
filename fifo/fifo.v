@@ -16,9 +16,14 @@ module fifo #(
 ) (
     //this feels scary
     //maybe two resets? that get set simultaneously (dangerous, but fine
-    //  when set for multiple cycles for both domains) then reset based 
+    //  when set for multiple cycles for both domains) then cleared based 
     //  on each domain (safe)?
     //reset also needs to be held long enough for q to be emptied
+    //  irrelevant if generate used
+
+    //new thoughts - rst should be treated like an asynchronous signal
+    //slap some flip flops on it
+    //use it to begin reset, then use post flip flops value to end reset
     input rst,
 
     input wr_clk,
@@ -31,6 +36,8 @@ module fifo #(
     output reg [width-1:0] dout,
     output reg empty
 );
+    //use gray code?
+    
     //{} for +1 overflow (e.g. depth=8)
     localparam idx_width = {1'b0, `CLOG2(depth)} + 1;
 
@@ -45,8 +52,10 @@ module fifo #(
 
     integer i;
     always @(posedge wr_clk) begin
-        if (rst) begin : name
+        if (rst) begin
             wr_idx <= 0;
+            //this block writes din to q, so also responsible for resetting din
+            //this could probably be a generate, not a for
             for (i=0; i<depth; i=i+1) q[i] <= 0;
         end else if (wr_en) begin
             q[wr_idx[idx_width-2:0]] <= din;
