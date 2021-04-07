@@ -24,6 +24,8 @@ module fifo #(
     //new thoughts - rst should be treated like an asynchronous signal
     //slap some flip flops on it
     //use it to begin reset, then use post flip flops value to end reset
+    
+    //aaight nevermind i guess i shouldnt worry about this
     input rst,
 
     input wr_clk,
@@ -55,7 +57,6 @@ module fifo #(
         if (rst) begin
             wr_idx <= 0;
             //this block writes din to q, so also responsible for resetting din
-            //this could probably be a generate, not a for
             for (i=0; i<depth; i=i+1) q[i] <= 0;
         end else if (wr_en) begin
             q[wr_idx[idx_width-2:0]] <= din;
