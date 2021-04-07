@@ -59,7 +59,7 @@ module fifo #(
             for (i=0; i<depth; i=i+1) q[i] <= 0;
         end else if (wr_en) begin
             q[wr_idx[idx_width-2:0]] <= din;
-            wr_idx = wr_idx + 1;
+            wr_idx <= wr_idx + 1;
         end
     end
 
@@ -67,7 +67,7 @@ module fifo #(
         if (rst) begin
             rd_idx <= 0;
         end else if (rd_en) begin
-            rd_idx = rd_idx + 1;
+            rd_idx <= rd_idx + 1;
         end
     end
 endmodule
