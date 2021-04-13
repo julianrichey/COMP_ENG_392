@@ -24,7 +24,7 @@ module temp_image_test();
         //start: first element in memory to be loaded
         //count: # of elements in memory to be loaded
         $fread(bmp_header, in_file, 0, bmp_header_size);
-        $fread(bmp_data, in_file, 54, bmp_data_size);
+        $fread(bmp_data, in_file, bmp_header_size, bmp_data_size);
 
         for (i=0; i<bmp_header_size; i=i+1) begin
             $fwrite(out_file, "%c", bmp_header[i]);
