@@ -20,7 +20,7 @@ module temp_image_test();
         in_file = $fopen("copper_720_540.bmp", "rb");
         out_file = $fopen("test_output.bmp", "wb");
 
-        //code = $fread( mem, fd, start, count)
+        //$fread( mem, fd, start, count)
         //start: first element in memory to be loaded
         //count: # of elements in memory to be loaded
         $fread(bmp_header, in_file, 0, bmp_header_size);
