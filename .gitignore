@@ -16,3 +16,13 @@ streaming/streaming/sim/work/_lib1_7.qtl
 streaming/streaming/sim/work/_vmake
 streaming/streaming/sim/work/_lib.qdb
 streaming/streaming/sim/work/_info
+grayscale/sim/copper_grayscale.bmp
+grayscale/sim/modelsim.ini
+grayscale/sim/testbench.wlf
+grayscale/sim/transcript
+grayscale/sim/work/_info
+grayscale/sim/work/_lib.qdb
+grayscale/sim/work/_lib1_0.qdb
+grayscale/sim/work/_lib1_0.qpg
+grayscale/sim/work/_lib1_0.qtl
+grayscale/sim/work/_vmake
