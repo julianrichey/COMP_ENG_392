@@ -18,10 +18,62 @@ module dut(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr
     output reg [(FIFO_DATA_WIDTH - 1):0] fifo_out_din;
     input  wire fifo_out_full;
 
-    localparam integer S0 = 2'h0, S1 = 2'h1;
-    reg [1:0] state, next_state;
-    reg [(FIFO_DATA_WIDTH - 1):0] data, data_c;
+    reg [FIFO_DATA_WIDTH-1:0] data, data_c;
 
+    function [23:0] rgb_avg;
+        input [23:0] vals;
+        reg [9:0] sum;
+        reg [7:0] result;
+        begin
+			sum = vals[23:16] + vals[15:8] + vals[7:0];
+            //may or may not fly in hardware
+            //if not, x/3 = x * 1/3; 1/3 = 0.0101010101 in base 2
+            //http://homepage.divms.uiowa.edu/~jones/bcd/divide.html
+			result = sum / 3;
+            rgb_avg = {3{result}};
+		end
+	endfunction
+
+    //This is the simplest possible test case for dut.v, but output 
+    //  still black (ie all 0s)
+    always @* begin
+        fifo_in_rd_en = 1'b1;
+        fifo_out_wr_en = 1'b1;
+        fifo_out_din = 24'h555555;
+    end
+
+    /*
+    always @(posedge clock, posedge reset) begin
+        if (reset) begin
+            fifo_in_rd_en <= 1'b0;
+            fifo_out_wr_en <= 1'b0;
+            fifo_out_din <= 'b0;
+        end else begin
+            data <= data_c;
+        end
+    end
+
+    //NOTE: 24'h555555 is a temporary value that should display gray. 
+    //  Currently, black is shown regardless of this value, meaning 
+    //  there's a bug somewhere after this. 
+    always @* begin
+        data_c = data;
+        fifo_in_rd_en = 1'b0;
+        fifo_out_wr_en = 1'b0;
+        fifo_out_din = 24'h555555;//data;
+
+        if (fifo_in_empty == 1'b0) begin
+            fifo_in_rd_en = 1'b1;
+            data_c = 24'h555555;//rgb_avg(fifo_in_dout);
+        end
+
+        if (fifo_out_full == 1'b0) begin
+            fifo_out_wr_en = 1'b1;
+        end
+    end
+    */
+
+    /*
     always @ (posedge clock, posedge reset)
     begin : clocked_process
         if ( reset == 1'b1 ) begin
@@ -63,5 +115,6 @@ module dut(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr
             end
         endcase
     end
+    */
 
 endmodule
