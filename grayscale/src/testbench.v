@@ -8,7 +8,7 @@ module dut_testbench();
 	parameter [18*8-1:0] fifo_in_name = "copper_720_540.bmp";
     
 	parameter [20*8-1:0] fifo_out_name = "copper_grayscale.bmp";
-	//parameter [119:0] tb_fifo_out_name = "tb_fifo_out.txt";
+	parameter [6*8-1:0] tb_fifo_out_name = "gs.bmp";
     
 	localparam integer BUFFER_SIZE = 32;
     localparam integer DWIDTH = 8*3;
@@ -137,6 +137,7 @@ module dut_testbench();
 
 	integer j;
 
+
 	always
 	begin : fifo_in_file_process
 		wait( reset == 1'b1 );
@@ -193,6 +194,7 @@ module dut_testbench();
 		wait( clock == 1'b0 );
 		wait( clock == 1'b1 );
 		
+		
 		$write("@ %0t: Writing file %s...\n", $time, fifo_out_name);
 		fifo_out_file = $fopen(fifo_out_name, "wb");
 
@@ -209,16 +211,17 @@ module dut_testbench();
             end else begin
                 fifo_out_rd_en <= 1'b1;
                 fifo_out_data_read = fifo_out_dout;
-				$fwrite(fifo_out_file, "%c", fifo_out_data_read[2]);
-				$fwrite(fifo_out_file, "%c", fifo_out_data_read[1]);
-				$fwrite(fifo_out_file, "%c", fifo_out_data_read[0]);
+				$fwrite(fifo_out_file, "%c", fifo_out_data_read[23:16]); 
+				$fwrite(fifo_out_file, "%c", fifo_out_data_read[15:8]); 
+				$fwrite(fifo_out_file, "%c", fifo_out_data_read[7:0]);
 			end
 		end
-
 
 		//Somewhere, DUT is somehow losing track of a few pixels. These
 		//	are temporary writes just to get the correct bmp size so that
 		//	it can be viewed. 
+		//code to allow us to view bmp file(any data that gets transferred)
+		
 		for (ww = 0; ww<600000;ww=ww + 1) begin
 			$fwrite(fifo_out_file, "%c", 8'hFF);
 		
@@ -226,13 +229,41 @@ module dut_testbench();
 		
 
 
+
+//Code from lecture 4/14/21 to transfer data between two files
 		/*
 		$write("@ %0t: Loading file %s...\n", $time, fifo_out_name);
-		fifo_out_file = $fopen(fifo_out_name, "r");
+		fifo_out_file = $fopen(fifo_in_name, "rb");
 		
+
+		$fread(bmp_header, fifo_out_file, 0, bmp_header_size);
+
 		$write("@ %0t: Writing file %s...\n", $time, tb_fifo_out_name);
-		tb_fifo_out_file = $fopen(tb_fifo_out_name, "w");
+		tb_fifo_out_file = $fopen(tb_fifo_out_name, "wb");
+
+		for (k=0; k<bmp_header_size; k=k+1) begin
+            $fwrite(tb_fifo_out_file, "%c", bmp_header[k]);
+        end
 		
+
+		while ( ! $feof(fifo_out_file) ) begin
+			$fscanf(fifo_out_file, "%c", fifo_out_data_read[23:16]);
+			$fscanf(fifo_out_file, "%c", fifo_out_data_read[15:8]);
+			$fscanf(fifo_out_file, "%c", fifo_out_data_read[7:0]);
+
+			//$fdisplay(fifo_out_data_read);
+
+            $fwrite(tb_fifo_out_file, "%c%c%c", fifo_out_data_read[23:16],fifo_out_data_read[15:8],fifo_out_data_read[7:0]);
+			$write("@ %0t: %x\n", $time, fifo_out_data_read);
+            //$fwrite(tb_fifo_out_file, "%x\n", fifo_out_data_read);
+				
+            
+        end
+
+*/
+
+//Code to test whether bytes of two files are same DOES NOT WORK
+		/*
         while ( ! $feof(fifo_out_file) )
         begin 
             wait( clock == 1'b1 );
@@ -245,18 +276,24 @@ module dut_testbench();
                 fifo_out_rd_en <= 1'b1;
                 fifo_out_data_read = fifo_out_dout;
 			
-                $fwrite(tb_fifo_out_file, "%x\n", fifo_out_data_read);
-                $fscanf(fifo_out_file, "%8x\n", fifo_out_data_cmp);
+				$fwrite(tb_fifo_out_file, "%c%c%c", fifo_out_data_read[23:16],fifo_out_data_read[15:8],fifo_out_data_read[7:0]);
+				
+                $fscanf(fifo_out_file, "%c", fifo_out_data_cmp[23:16]);
+				$fscanf(fifo_out_file, "%c", fifo_out_data_cmp[15:8]);
+				$fscanf(fifo_out_file, "%c", fifo_out_data_cmp[7:0]);
+				
                 if (to_01(fifo_out_data_read) != to_01(fifo_out_data_cmp)) begin 
                     fifo_out_errors <= fifo_out_errors + 1;
                     $write("@ %0t: %s(%0d): ERROR: %x != %x for 'fifo_out'.\n", $time, tb_fifo_out_name, fifo_out_read_iter + 1, fifo_out_data_read, fifo_out_data_cmp);
                 end
+				
                 fifo_out_read_iter <= fifo_out_read_iter + 1;
+				
             end 
 		end
 		*/
 		
-		//$fclose(tb_fifo_out_file);
+		$fclose(tb_fifo_out_file);
 		$fclose(fifo_out_file);
 		
 		wait( clock == 1'b0 );
