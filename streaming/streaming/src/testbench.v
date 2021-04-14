@@ -5,13 +5,14 @@
 module dut_testbench();
 	parameter [63:0] clock_period = 100;
     
-	parameter [87:0] fifo_in_name = "fifo_in.txt";
+	//parameter [87:0] fifo_in_name = "copper_720_540.bmp";
 	parameter integer fifo_in_buf_size = 32;
     
 	parameter [95:0] fifo_out_name = "fifo_out.txt";
 	parameter [119:0] tb_fifo_out_name = "tb_fifo_out.txt";
 	parameter integer fifo_out_buf_size = 32;
     
+	//TODO Change this to be size of 3 bytes(24) at some point perhaps
     localparam integer DWIDTH = 32;
         
 	reg clock = 1'b1;
@@ -47,6 +48,22 @@ module dut_testbench();
 	integer fifo_out_read_iter = 0;
 	reg [DWIDTH-1:0] fifo_out_data_read = 'h0;
 	reg [DWIDTH-1:0] fifo_out_data_cmp = 'h0;
+
+
+//ADDED Julian's way of reading BMP files below:
+	localparam integer bmp_width = 720;
+    localparam integer bmp_height = 540;
+    localparam integer bmp_header_size = 54;
+    localparam integer bmp_data_size = bmp_width*bmp_height*3; //1 byte for each of rbg
+	localparam integer incrementer = DWIDTH / 8;
+
+	reg [7:0] bmp_header [0:bmp_header_size-1];
+    reg [7:0] bmp_data [0:bmp_data_size-1];
+	integer ii;
+	/*
+	reg are_done = 1'b0;
+	reg [bmp_data_size-1:0] iter_count;
+	*/
 
 	function [DWIDTH-1:0] to_01;
 		input reg [DWIDTH-1:0] val;
@@ -130,16 +147,19 @@ module dut_testbench();
 		$stop;
 	end
 
-	always 
+	//always
+	initial
 	begin : fifo_in_file_process
 		wait( reset == 1'b1 );
 		wait( reset == 1'b0 );
 		wait( clock == 1'b0 );
 		wait( clock == 1'b1 );
 		
-		$write("@ %0t: Loading file %s...\n", $time, fifo_in_name);
-		fifo_in_file = $fopen(fifo_in_name, "r");
+		$write("@ %0t: Loading file %s...\n", $time, "copper_720_540.bmp");
+		fifo_in_file = $fopen("copper_720_540.bmp", "rb");
 		
+		//instead of this
+		/*
         while ( ! $feof(fifo_in_file) )
         begin 
             wait( clock == 1'b1 );
@@ -154,6 +174,44 @@ module dut_testbench();
                 fifo_in_din <= fifo_in_data_write;
             end
 		end
+		*/
+
+		//loop through our array of bmp data and assign it do fifo_in_din
+		$fread(bmp_header, fifo_in_file, 0, bmp_header_size);
+        $fread(bmp_data, fifo_in_file, bmp_header_size, bmp_data_size);
+		/*
+		are_done <= 1'b0;
+		//IDK how to make all bits in iter_count 0   (vhdl itd be like (others -> '0')   )
+		iter_count <= 'b0;
+		while (are_done == 1'b0) begin
+			wait(clock == 1'b1);
+			wait(clock == 1'b0);
+			if ( fifo_in_full == 1'b1 ) begin
+				fifo_in_din <= 'h0;
+                fifo_in_wr_en <= 1'b0;
+            end
+            else begin
+                fifo_in_din <= {bmp_data[i+0], bmp_data[i+1], bmp_data[i+2], 8'h00};
+				fifo_in_wr_en <= 1'b1;
+            end
+			
+		end
+		*/
+		
+		for (ii=0; ii<bmp_data_size; ii=ii+3) begin
+			wait( clock == 1'b1 );
+            wait( clock == 1'b0 );
+			if ( fifo_in_full == 1'b1 ) begin
+				fifo_in_din <= 'h0;
+                fifo_in_wr_en <= 1'b0;
+            end
+            else begin
+                fifo_in_din <= {bmp_data[ii+0], bmp_data[ii+1], bmp_data[ii+2], 8'h00};
+				fifo_in_wr_en <= 1'b1;
+            end
+        end
+		
+		
 		
 		$fclose(fifo_in_file);
 		
