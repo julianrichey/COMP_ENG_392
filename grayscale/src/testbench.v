@@ -147,6 +147,11 @@ module dut_testbench();
 		$write("@ %0t: Loading file %s...\n", $time, fifo_in_name);
 		fifo_in_file = $fopen(fifo_in_name, "rb");
 
+		//Initial Read that reads all of the BMP header data(Not sure how we know the BMP_Header_Size though   -robert)
+		//can also do this as follows:
+		//bmp header is always 14 bytes
+		//$fread(bmp_header,fifo_in_file,0,14)
+		//byte 10 tells us
 		$fread(bmp_header, fifo_in_file, 0, bmp_header_size);
 
 		for (j=0; j<bmp_data_size; j=j+increment) begin
@@ -156,6 +161,8 @@ module dut_testbench();
                 fifo_in_wr_en <= 1'b0;
                 fifo_in_din <= 'h0;
             end else begin
+				//this is formatted as follows:
+				//fread(reg_we_are_writing_data_to,filename_we_get_data_from,Start_location_of_data_in_file,How_much_data_we_are_reading)
 				$fread(fifo_in_data_write, fifo_in_file, bmp_header_size+(j*increment), increment);
                 fifo_in_wr_en <= 1'b1;
                 fifo_in_din <= fifo_in_data_write;
@@ -177,6 +184,7 @@ module dut_testbench();
 	end
 
 	integer k;
+	integer ww;
 
 	always 
 	begin : fifo_out_file_process
@@ -211,19 +219,11 @@ module dut_testbench();
 		//Somewhere, DUT is somehow losing track of a few pixels. These
 		//	are temporary writes just to get the correct bmp size so that
 		//	it can be viewed. 
-		$fwrite(fifo_out_file, "%c", 8'hFF);
-		$fwrite(fifo_out_file, "%c", 8'hFF);
-		$fwrite(fifo_out_file, "%c", 8'hFF);
-		$fwrite(fifo_out_file, "%c", 8'hFF);
-		$fwrite(fifo_out_file, "%c", 8'hFF);
-		$fwrite(fifo_out_file, "%c", 8'hFF);
+		for (ww = 0; ww<600000;ww=ww + 1) begin
+			$fwrite(fifo_out_file, "%c", 8'hFF);
 		
-		$fwrite(fifo_out_file, "%c", 8'hFF);
-		$fwrite(fifo_out_file, "%c", 8'hFF);
-		$fwrite(fifo_out_file, "%c", 8'hFF);
-		$fwrite(fifo_out_file, "%c", 8'hFF);
-		$fwrite(fifo_out_file, "%c", 8'hFF);
-		$fwrite(fifo_out_file, "%c", 8'hFF);
+		end
+		
 
 
 		/*

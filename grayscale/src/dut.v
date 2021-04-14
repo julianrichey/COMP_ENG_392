@@ -20,6 +20,9 @@ module dut(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr
 
     reg [FIFO_DATA_WIDTH-1:0] data, data_c;
 
+    localparam integer S0 = 2'h0, S1 = 2'h1;
+    reg [1:0] state, next_state;
+
     function [23:0] rgb_avg;
         input [23:0] vals;
         reg [9:0] sum;
@@ -33,14 +36,18 @@ module dut(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr
             rgb_avg = {3{result}};
 		end
 	endfunction
-
+    
+    
     //This is the simplest possible test case for dut.v, but output 
     //  still black (ie all 0s)
+    /*
     always @* begin
         fifo_in_rd_en = 1'b1;
         fifo_out_wr_en = 1'b1;
         fifo_out_din = 24'h555555;
     end
+    */
+
 
     /*
     always @(posedge clock, posedge reset) begin
@@ -73,7 +80,7 @@ module dut(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr
     end
     */
 
-    /*
+    
     always @ (posedge clock, posedge reset)
     begin : clocked_process
         if ( reset == 1'b1 ) begin
@@ -97,6 +104,7 @@ module dut(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr
         case(state) 
             S0: begin
                 if ( fifo_in_empty == 1'b0 ) begin
+                    //HERE IS WHERE WE WOULD CALCULATE THE GRAYSCALE
                     data_c <= fifo_in_dout;
                     fifo_in_rd_en <= 1'b1;
                     next_state <= S1;
@@ -115,6 +123,6 @@ module dut(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr
             end
         endcase
     end
-    */
+    
 
 endmodule

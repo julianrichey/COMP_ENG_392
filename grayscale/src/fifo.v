@@ -93,7 +93,7 @@ module fifo(rd_clk, wr_clk, reset, rd_en, wr_en, din, dout, full, empty);
     )
     begin : p_write_addr
         if (reset == 1'h1) begin 
-            write_addr <= 1'h0;
+            write_addr <= 'h0;
         end
         else if (wr_clk == 1'b1) begin 
             write_addr <= write_addr_t;
