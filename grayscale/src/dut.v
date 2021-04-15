@@ -19,9 +19,7 @@ module dut(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr
     input  wire fifo_out_full;
 
     reg [FIFO_DATA_WIDTH-1:0] data, data_c;
-
-    localparam integer S0 = 2'h0, S1 = 2'h1;
-    reg [1:0] state, next_state;
+    reg is_data, is_data_c;
 
     function [23:0] rgb_avg;
         input [23:0] vals;
@@ -37,92 +35,34 @@ module dut(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr
 		end
 	endfunction
     
-    
-    //This is the simplest possible test case for dut.v, but output 
-    //  still black (ie all 0s)
-    /*
-    always @* begin
-        fifo_in_rd_en = 1'b1;
-        fifo_out_wr_en = 1'b1;
-        fifo_out_din = 24'h555555;
-    end
-    */
-
-
-    /*
     always @(posedge clock, posedge reset) begin
         if (reset) begin
             fifo_in_rd_en <= 1'b0;
             fifo_out_wr_en <= 1'b0;
             fifo_out_din <= 'b0;
+            is_data <= 1'b0;
         end else begin
             data <= data_c;
+            is_data <= is_data_c;
         end
     end
 
-    //NOTE: 24'h555555 is a temporary value that should display gray. 
-    //  Currently, black is shown regardless of this value, meaning 
-    //  there's a bug somewhere after this. 
     always @* begin
         data_c = data;
         fifo_in_rd_en = 1'b0;
         fifo_out_wr_en = 1'b0;
-        fifo_out_din = 24'h555555;//data;
+        fifo_out_din = data;
+        is_data_c = 1'b0;
 
         if (fifo_in_empty == 1'b0) begin
+            is_data_c = 1'b1;
             fifo_in_rd_en = 1'b1;
-            data_c = 24'h555555;//rgb_avg(fifo_in_dout);
+            data_c = rgb_avg(fifo_in_dout);
         end
 
-        if (fifo_out_full == 1'b0) begin
+        if (fifo_out_full == 1'b0 && is_data == 1'b1) begin
             fifo_out_wr_en = 1'b1;
         end
     end
-    */
-
-    
-    always @ (posedge clock, posedge reset)
-    begin : clocked_process
-        if ( reset == 1'b1 ) begin
-            state <= S0;
-            data <= 0;
-        end
-        else if ( clock == 1'b1 ) begin
-            state <= next_state;
-            data <= data_c;
-        end
-    end
-
-    always @ ( * )
-    begin : fsm_process
-        next_state <= state;
-        data_c <= data;
-        fifo_in_rd_en <= 1'b0;
-        fifo_out_wr_en <= 1'b0;
-        fifo_out_din <= data;
-
-        case(state) 
-            S0: begin
-                if ( fifo_in_empty == 1'b0 ) begin
-                    //HERE IS WHERE WE WOULD CALCULATE THE GRAYSCALE
-                    data_c <= fifo_in_dout;
-                    fifo_in_rd_en <= 1'b1;
-                    next_state <= S1;
-                end
-            end
-
-            S1: begin
-                if ( fifo_out_full == 1'b0 ) begin
-                    fifo_out_wr_en <= 1'b1;
-                    next_state <= S0;
-                end                
-            end
-
-            default : begin
-                next_state <= S0;
-            end
-        endcase
-    end
-    
 
 endmodule
