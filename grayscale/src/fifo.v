@@ -13,8 +13,8 @@
 
 
 module fifo #(
-    parameter FIFO_BUFFER_SIZE = 4,
-    parameter FIFO_DATA_WIDTH = 24
+    parameter FIFO_BUFFER_SIZE = 0,
+    parameter FIFO_DATA_WIDTH = 0
 ) (
     input reset,
 
