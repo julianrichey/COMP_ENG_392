@@ -4,7 +4,6 @@
 
 module dut_testbench();
 
-    //NOTE: going forward, this will be assumed to be 1, as sobel assumes grayscale input
     localparam integer CONVERT_GRAYSCALE = 1;
         //CONVERT_GRAYSCALE=0: 24->24 rgb
         //CONVERT_GRAYSCALE=1: 24->8 grayscale
