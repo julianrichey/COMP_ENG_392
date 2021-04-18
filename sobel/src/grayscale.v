@@ -1,26 +1,25 @@
 
 `timescale 1 ns / 1 ns
 
-module grayscale(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr_en, fifo_out_din, fifo_out_full);
+module grayscale #(
+    parameter integer DWIDTH_IN,
+    parameter integer DWIDTH_OUT
+) (
+    input clock,
+    input reset,
 
-    parameter integer CONVERT_GRAYSCALE;
-    parameter integer FIFO_DWIDTH_IN;
-    parameter integer FIFO_DWIDTH_OUT;
+    //fifo in
+    output reg fifo_in_rd_en, 
+    input [FIFO_DWIDTH_IN-1:0] fifo_in_dout, 
+    input fifo_in_empty,
 
-    input wire clock;
-    input wire reset;
+    //fifo out
+    output reg fifo_out_wr_en, 
+    output reg [DWIDTH_OUT-1:0] fifo_out_din, 
+    input fifo_out_full
+);
 
-    // input fifo
-    output reg fifo_in_rd_en;
-    input wire [(FIFO_DWIDTH_IN - 1):0] fifo_in_dout;
-    input wire fifo_in_empty;
-
-    // output fifo
-    output reg fifo_out_wr_en;
-    output reg [(FIFO_DWIDTH_OUT - 1):0] fifo_out_din;
-    input wire fifo_out_full;
-
-    reg [FIFO_DWIDTH_OUT-1:0] data, data_c;
+    reg [DWIDTH_OUT-1:0] data, data_c;
     reg is_data, is_data_c;
 
     function [7:0] rgb_avg;
@@ -57,7 +56,7 @@ module grayscale(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_
         if (fifo_in_empty == 1'b0) begin
             is_data_c = 1'b1;
             fifo_in_rd_en = 1'b1;
-            data_c = (CONVERT_GRAYSCALE) ? rgb_avg(fifo_in_dout) : fifo_in_dout;
+            data_c = rgb_avg(fifo_in_dout);
         end
 
         if (fifo_out_full == 1'b0 && is_data == 1'b1) begin

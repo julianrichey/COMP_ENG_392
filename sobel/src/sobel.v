@@ -1,29 +1,54 @@
 
 `timescale 1 ns/1 ns
 
-module sobel(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr_en, fifo_out_din, fifo_out_full);
+
+module sobel #(
+    parameter integer DWIDTH_IN, //24 bits
+    parameter integer DWIDTH_OUT //8 bits
+) (
+    input clock,
+    input reset,
+
+    //fifo in
+    output reg fifo_in_rd_en, 
+    input [FIFO_DWIDTH_IN-1:0] fifo_in_dout, 
+    input fifo_in_empty,
+
+    //fifo out
+    output reg fifo_out_wr_en, 
+    output reg [DWIDTH_OUT-1:0] fifo_out_din, 
+    input fifo_out_full
+);
+
+    //shift reg
+
+    //with this code, you can assume that, every cycle, you have the 3x3 grayscale input you want
+    //given the pixels [1,2,3,721,722,723,1441,1442,1443], shift_reg is formatted like so:
+    //
+
+    reg [7:0] shift_reg [0:2] [0:2];
+
+    integer i,j;
+    always @(posedge clock) begin
+        if (reset) begin
+            for (i=0; i<3; i=i+1) begin
+                for (j=0; j<3; j=j+1) begin
+                    q[i][j] <= 8'h00;
+                end
+            end
+        end else begin
+            
+        end
+    end
 
 
-    parameter integer SOBEL_DWIDTH_IN; //8*9 bits. 1D array, not 2D, so that we don't have to change fifo or anything.
-    parameter integer SOBEL_DWIDTH_OUT; //8 bits
 
-    input wire clock;
-    input wire reset;
 
-    // input fifo
-    output reg fifo_in_rd_en;
-    input wire [(FIFO_DWIDTH_IN - 1):0] fifo_in_dout;
-    input wire fifo_in_empty;
-
-    // output fifo
-    output reg fifo_out_wr_en;
-    output reg [(FIFO_DWIDTH_OUT - 1):0] fifo_out_din;
-    input wire fifo_out_full;
 
     reg [FIFO_DWIDTH_OUT-1:0] data, data_c;
     reg is_data, is_data_c;
 
-    always @(posedge clock, posedge reset) begin
+    always @(posedge clock) begin
         
     end
 

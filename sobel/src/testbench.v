@@ -4,24 +4,36 @@
 
 module dut_testbench();
 
-    //NOTE: going forward, this will be assumed to be 1, as sobel assumes grayscale input
-    localparam integer CONVERT_GRAYSCALE = 1;
-        //CONVERT_GRAYSCALE=0: 24->24 rgb
-        //CONVERT_GRAYSCALE=1: 24->8 grayscale
-    localparam integer BUFFER_SIZE = 2; //2 is minimum
-    localparam integer DWIDTH_IN = 8*3;
-    localparam integer DWIDTH_OUT = (CONVERT_GRAYSCALE) ? 8*1 : 8*3;
+    //for now, not dealing with memory overlap. just do as many 'reads' as needed. will optimize later
+
+    //how many of each module must be instantiated
+    //NOTE: just using 1 sobel for now. will using parameter in generate blocks later
+    localparam integer NUM_SOBELS = 1; //vertical pixels is max (here, 540), 1 is min. 
+    localparam integer NUM_GRAYSCALES = NUM_SOBELS * 3; //for 3x3 sobel, each sobel needs 3 new grayscale pixels each cycle. written to shift reg
+
+    //from memory to grayscale
+    localparam integer RGB_BUFFER = 2; //2 is min... for all so far? because 1 write and read per cycle
+    localparam integer RGB_DWIDTH = 8 * 3 * NUM_GRAYSCALES; //1 byte/color, 3 colors/pixel, NUM_GRAYSCALES pixels/cycle
+
+    //from grayscale to sobel
+    localparam integer GRAYSCALE_BUFFER = 2;
+    localparam integer GRAYSCALE_DWIDTH = 8 * NUM_GRAYSCALES; //each sobel receives 1 byte/cycle from each grayscale
+
+    //from sobel to memory
+    localparam integer SOBEL_BUFFER = 2;
+    localparam integer SOBEL_DWIDTH = 8 * NUM_SOBELS;
     
     parameter [18*8-1:0] fifo_in_name = "copper_720_540.bmp";
-    parameter [20*8-1:0] fifo_out_name = "copper_grayscale.bmp";
+    parameter [20*8-1:0] fifo_out_name = "copper_sobel.bmp";
     //parameter [119:0] tb_fifo_out_name = "tb_fifo_out.txt";
+
+    //TODO: deal with all DWIDTH stuff around here. also, when reading in file, do it 3 different times and concat for one input/cycle
 
     localparam integer bmp_width = 720;
     localparam integer bmp_height = 540;
     localparam integer bmp_header_size = 54;
     localparam integer bmp_data_size = bmp_width*bmp_height*3;
-        //1 byte for each of [r,g,b]
-    localparam integer increment = DWIDTH_IN / 8;    
+    localparam integer increment = DWIDTH_IN / 8;
 
     parameter [63:0] clock_period = 100;
 
@@ -82,10 +94,14 @@ module dut_testbench();
     endfunction
 
     dut_system #(
-        .CONVERT_GRAYSCALE(CONVERT_GRAYSCALE),
-        .FIFO_DWIDTH_IN(DWIDTH_IN),
-        .FIFO_DWIDTH_OUT(DWIDTH_OUT),
-        .FIFO_BUFFER_SIZE(BUFFER_SIZE)
+        .NUM_SOBELS(NUM_SOBELS),
+        .NUM_GRAYSCALES(NUM_GRAYSCALES),
+        .RGB_BUFFER(RGB_BUFFER),
+        .RGB_DWIDTH(RGB_DWIDTH),
+        .GRAYSCALE_BUFFER(GRAYSCALE_BUFFER),
+        .GRAYSCALE_DWIDTH(GRAYSCALE_DWIDTH),
+        .SOBEL_BUFFER(SOBEL_BUFFER),
+        .SOBEL_DWIDTH(SOBEL_DWIDTH)
     ) dut_system_inst (
         .clock(clock),
         .reset(reset),
