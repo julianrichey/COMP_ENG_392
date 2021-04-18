@@ -1,7 +1,7 @@
 
 `timescale 1 ns / 1 ns
 
-module dut(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr_en, fifo_out_din, fifo_out_full);
+module grayscale(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr_en, fifo_out_din, fifo_out_full);
 
     parameter integer CONVERT_GRAYSCALE;
     parameter integer FIFO_DWIDTH_IN;
