@@ -125,13 +125,14 @@ module sobel #(
             //     { -1,  0,  1 }
             // };
 
-            //horizontal sobel filter
-            hor_val = (-{6'h00, shift_reg[0][0]}) +
-                        (-({6'h00, shift_reg[0][1]} << 1)) +
-                        (-{6'h00, shift_reg[0][2]}) +
-                        {6'h00, shift_reg[2][0]} +
-                        ({6'h00, shift_reg[2][1]} << 1) +
-                        {6'h00, shift_reg[2][2]};
+            // horizontal_gradient += in_data[j][i] * horizontal_operator[i][j];
+
+            hor_grad = (-{6'h00, shift_reg[0][0]}) +
+                       (-({6'h00, shift_reg[1][0]} << 1)) +
+                       (-{6'h00, shift_reg[2][0]}) +
+                       {6'h00, shift_reg[0][2]} +
+                       ({6'h00, shift_reg[1][2]} << 1) +
+                       {6'h00, shift_reg[2][2]};
 
             // const int vertical_operator[3][3] = {
             //     { -1,  -2,  -1 },
@@ -139,12 +140,13 @@ module sobel #(
             //     {  1,   2,   1 }
             // };
 
-            //vertical sobel filter
-            vert_val = {6'h00, shift_reg[0][0]} +
-                        ({6'h00, shift_reg[1][0]} << 1) +
-                        {6'h00, shift_reg[2][0]} +
-                        (-{6'h00, -shift_reg[0][2]}) +
-                        (-({6'h00, shift_reg[1][2]} << 1)) +
+            // vertical_gradient += in_data[j][i] * vertical_operator[i][j];
+
+            vert_grad = {6'h00, shift_reg[0][0]} +
+                        ({6'h00, shift_reg[0][1]} << 1) +
+                        {6'h00, shift_reg[0][2]} +
+                        (-{6'h00, -shift_reg[2][0]}) +
+                        (-({6'h00, shift_reg[2][1]} << 1)) +
                         (-{6'h00, -shift_reg[2][2]});
 
             data_c = ({1'b0, abs(hor_val)} + {1'b0, abs(vert_val)}) >> 1;
