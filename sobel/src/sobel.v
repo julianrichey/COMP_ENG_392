@@ -45,9 +45,6 @@ module sobel #(
             abs = (val < 0) ? -val : val;
         end
     endfunction
-
-
-
     
     always @(posedge clock) begin
         if (reset) begin
