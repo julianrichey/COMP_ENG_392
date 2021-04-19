@@ -21,10 +21,16 @@ module dut_testbench();
     localparam integer SOBEL_DWIDTH = 8 * NUM_SOBELS;
     localparam integer SOBEL_BUFFER = 2;
     
-    parameter [20*8-1:0] fifo_in_name_0 = "copper_720_540_0.bmp";
-    parameter [20*8-1:0] fifo_in_name_1 = "copper_720_540_1.bmp";
-    parameter [20*8-1:0] fifo_in_name_2 = "copper_720_540_2.bmp";
-    parameter [20*8-1:0] fifo_out_name = "copper_sobel.bmp";
+    // parameter [20*8-1:0] fifo_in_name_0 = "copper_720_540_0.bmp";
+    // parameter [20*8-1:0] fifo_in_name_1 = "copper_720_540_1.bmp";
+    // parameter [20*8-1:0] fifo_in_name_2 = "copper_720_540_2.bmp";
+    // parameter [20*8-1:0] fifo_out_name = "copper_sobel.bmp";
+
+    parameter [29*8-1:0] fifo_in_name_0 = "brooklyn_bridge_720_540_0.bmp";
+    parameter [29*8-1:0] fifo_in_name_1 = "brooklyn_bridge_720_540_1.bmp";
+    parameter [29*8-1:0] fifo_in_name_2 = "brooklyn_bridge_720_540_2.bmp";
+    parameter [25*8-1:0] fifo_out_name = "brooklyn_bridge_sobel.bmp";
+
     //parameter [119:0] tb_fifo_out_name = "tb_fifo_out.txt";
 
     localparam integer bmp_width = 720;

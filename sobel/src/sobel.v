@@ -35,7 +35,7 @@ module sobel #(
             //shift_reg[2][2] is pixel 1444
 
     reg [7:0] shift_reg [0:2] [0:2];
-    reg [13:0] hor_val,vert_val;
+    reg [13:0] hor_grad,vert_grad,v;
     integer i,j;
 
     function [13:0] abs;
@@ -91,7 +91,7 @@ module sobel #(
         end
     end
 
-    always @* begin
+    always @* begin : sobel_computation
         //default values
         data_c = data;
         fifo_in_rd_en = 1'b0;
@@ -145,11 +145,12 @@ module sobel #(
             vert_grad = {6'h00, shift_reg[0][0]} +
                         ({6'h00, shift_reg[0][1]} << 1) +
                         {6'h00, shift_reg[0][2]} +
-                        (-{6'h00, -shift_reg[2][0]}) +
+                        (-{6'h00, shift_reg[2][0]}) +
                         (-({6'h00, shift_reg[2][1]} << 1)) +
-                        (-{6'h00, -shift_reg[2][2]});
+                        (-{6'h00, shift_reg[2][2]});
 
-            data_c = ({1'b0, abs(hor_val)} + {1'b0, abs(vert_val)}) >> 1;
+            v = ({1'b0, abs(hor_grad)} + {1'b0, abs(vert_grad)}) >> 1;
+            data_c = ((v > 255) ? 255 : v);
         end
 
         if (fifo_out_full == 1'b0 && is_data == 1'b1) begin
