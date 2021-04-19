@@ -10,65 +10,65 @@ z2
 cModel Technology
 Z0 dC:/Users/julia/Documents/GitHub/COMP_ENG_392/grayscale/sim
 vdut
-Z1 !s110 1618770059
+!s110 1618770059
 !i10b 1
 !s100 ?]_AJ07[>Z`WViAiEbQmX1
-Z2 !s11b Dg1SIo80bB@j0V0VzS_@n1
+Z1 !s11b Dg1SIo80bB@j0V0VzS_@n1
 ILn4XR23cRm6K3UC[N>_V:1
-Z3 VDg1SIo80bB@j0V0VzS_@n1
+Z2 VDg1SIo80bB@j0V0VzS_@n1
 R0
 w1618540511
 8../src/dut.v
 F../src/dut.v
 !i122 39
 L0 4 65
-Z4 OV;L;2020.1;71
+Z3 OV;L;2020.1;71
 r1
 !s85 0
 31
-Z5 !s108 1618770058.000000
+!s108 1618770058.000000
 !s107 ../src/dut.v|
 !s90 -reportprogress|300|-work|work|../src/dut.v|
 !i113 1
-Z6 o-work work
-Z7 tCvgOpt 0
+Z4 o-work work
+Z5 tCvgOpt 0
 vdut_system
-R1
+Z6 !s110 1618802115
 !i10b 1
-!s100 FBn;a7V>A=GBeY^Vgn?Fg0
+!s100 4:OEFk9cF[d8Xz@d9mHbf0
+R1
+IATDG^o@>S]Y5o6[?9Ek<H1
 R2
-ImlIZZi0HFn7g8b7<K:mJW0
-R3
-R0
-w1618540358
+Z7 dC:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel/sim
+w1618800886
 8../src/dut_system.v
 F../src/dut_system.v
-!i122 40
-L0 4 77
-R4
+!i122 82
+L0 41 147
+R3
 r1
 !s85 0
 31
-Z8 !s108 1618770059.000000
+Z8 !s108 1618802115.000000
 !s107 ../src/dut_system.v|
 !s90 -reportprogress|300|-work|work|../src/dut_system.v|
 !i113 1
-R6
-R7
+R4
+R5
 vdut_testbench
-R1
+R6
 !i10b 1
-!s100 5nFoGWKNl>f75O@dV@OKF2
+!s100 7>NC?F[O`1FeC2W9203a00
+R1
+I6zTkb9UdcX7Nm=dHbJNfJ3
 R2
-IaVg?:MbBAVSQ0@PX8hoCi0
-R3
-R0
-w1618540574
+R7
+w1618802095
 8../src/testbench.v
 F../src/testbench.v
-!i122 41
-L0 5 279
-R4
+!i122 83
+L0 3 305
+R3
 r1
 !s85 0
 31
@@ -76,28 +76,74 @@ R8
 !s107 ../src/testbench.v|
 !s90 -reportprogress|300|-work|work|../src/testbench.v|
 !i113 1
-R6
-R7
+R4
+R5
 vfifo
-!s110 1618770058
+Z9 !s110 1618802114
 !i10b 1
-!s100 OAiK?G4:d::l8f1K^O<FV2
+!s100 ?8UJVoj:[:^7JXKb^MaLP3
+R1
+IDjDHdk5QP]<ZQJzPe2_C@0
 R2
-IY2X]9Zd66JUNzlZOAN4EX1
-R3
-R0
-w1618770016
+R7
+w1618798463
 8../src/fifo.v
 F../src/fifo.v
-!i122 38
-L0 15 47
-R4
+!i122 79
+L0 18 47
+R3
 r1
 !s85 0
 31
-R5
+Z10 !s108 1618802114.000000
 !s107 ../src/fifo.v|
 !s90 -reportprogress|300|-work|work|../src/fifo.v|
 !i113 1
-R6
+R4
+R5
+vgrayscale
+R9
+!i10b 1
+!s100 380E^_RE;lbA8AWH;79Al3
+R1
+IZ>@kBJP:M]O_`8g:][8d=3
+R2
 R7
+w1618798456
+8../src/grayscale.v
+F../src/grayscale.v
+!i122 80
+L0 3 64
+R3
+r1
+!s85 0
+31
+R10
+!s107 ../src/grayscale.v|
+!s90 -reportprogress|300|-work|work|../src/grayscale.v|
+!i113 1
+R4
+R5
+vsobel
+R9
+!i10b 1
+!s100 VR[=@Bgji`]YDZ[RJh8?:2
+R1
+I==m5KEH<?Xhn2ZF`GNf_n3
+R2
+R7
+w1618801786
+8../src/sobel.v
+F../src/sobel.v
+!i122 81
+L0 3 121
+R3
+r1
+!s85 0
+31
+R10
+!s107 ../src/sobel.v|
+!s90 -reportprogress|300|-work|work|../src/sobel.v|
+!i113 1
+R4
+R5

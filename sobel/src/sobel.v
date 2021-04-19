@@ -37,32 +37,35 @@ module sobel #(
     reg [7:0] shift_reg [0:2] [0:2];
 
     integer i,j;
-    always @(posedge clock) begin
-        if (reset) begin
-            for (i=0; i<3; i=i+1) begin
-                for (j=0; j<3; j=j+1) begin
-                    q[i][j] <= 8'h00;
-                end
-            end
-        end else begin
-            for (i=0; i<3; i=i+1) begin
-                for (j=0; j<3; j=j+1) begin
-                    shift_reg[i][j] <= (i<2) ? shift_reg[i+1][j] : fifo_in_dout[(8*(1+j))-1:8*j];
-                end
-            end
-            /* //should do the following:
-            shift_reg[0][0] <= shift_reg[1][0];
-            shift_reg[1][0] <= shift_reg[2][0];
-            shift_reg[2][0] <= fifo_in_dout[(8*(1+0))-1:8*0];
-            shift_reg[0][1] <= shift_reg[1][1];
-            shift_reg[1][1] <= shift_reg[2][1];
-            shift_reg[2][1] <= fifo_in_dout[(8*(1+1))-1:8*1];
-            shift_reg[0][2] <= shift_reg[1][2];
-            shift_reg[1][2] <= shift_reg[2][2];
-            shift_reg[2][2] <= fifo_in_dout[(8*(1+2))-1:8*2];
-            */
-        end
-    end
+
+    //THIS IS BROKEN
+
+    // always @(posedge clock) begin
+    //     if (reset) begin
+    //         for (i=0; i<3; i=i+1) begin
+    //             for (j=0; j<3; j=j+1) begin
+    //                 shift_reg[i][j] <= 8'h00;
+    //             end
+    //         end
+    //     end else begin
+    //         // for (i=0; i<3; i=i+1) begin
+    //         //     for (j=0; j<3; j=j+1) begin
+    //         //         shift_reg[i][j] <= (i<2) ? shift_reg[i+1][j] : fifo_in_dout[8*j +: 8];  
+    //         //     end
+    //         // end
+    //         //should do the following:
+    //         shift_reg[0][0] <= shift_reg[1][0];
+    //         shift_reg[1][0] <= shift_reg[2][0];
+    //         shift_reg[2][0] <= fifo_in_dout[(8*(1+0))-1:8*0];
+    //         shift_reg[0][1] <= shift_reg[1][1];
+    //         shift_reg[1][1] <= shift_reg[2][1];
+    //         shift_reg[2][1] <= fifo_in_dout[(8*(1+1))-1:8*1];
+    //         shift_reg[0][2] <= shift_reg[1][2];
+    //         shift_reg[1][2] <= shift_reg[2][2];
+    //         shift_reg[2][2] <= fifo_in_dout[(8*(1+2))-1:8*2];
+    //         //
+    //     end
+    // end
 
     reg [DWIDTH_OUT-1:0] data, data_c;
     reg is_data, is_data_c;
@@ -73,9 +76,23 @@ module sobel #(
             fifo_out_wr_en <= 1'b0;
             fifo_out_din <= 8'h00;
             is_data <= 1'b0;
+            for (i=0; i<3; i=i+1) begin
+                for (j=0; j<3; j=j+1) begin
+                    shift_reg[i][j] <= 8'h00;
+                end
+            end
         end else begin
             data <= data_c;
             is_data <= is_data_c;
+            shift_reg[0][0] <= shift_reg[1][0];
+            shift_reg[1][0] <= shift_reg[2][0];
+            shift_reg[2][0] <= fifo_in_dout[(8*(1+0))-1:8*0];
+            shift_reg[0][1] <= shift_reg[1][1];
+            shift_reg[1][1] <= shift_reg[2][1];
+            shift_reg[2][1] <= fifo_in_dout[(8*(1+1))-1:8*1];
+            shift_reg[0][2] <= shift_reg[1][2];
+            shift_reg[1][2] <= shift_reg[2][2];
+            shift_reg[2][2] <= fifo_in_dout[(8*(1+2))-1:8*2];
         end
     end
 
@@ -92,7 +109,7 @@ module sobel #(
             fifo_in_rd_en = 1'b1;
 
             //temporary: using the middle pixel of each should perfectly reconstruct the grayscale image
-            data_c = shift_reg[1][1];
+            data_c = fifo_in_dout[7:0];//shift_reg[1][1];
 
             //use 9 values in shift_reg to compute data_c here
             //data_c = sobel_func(shift_reg)

@@ -88,7 +88,7 @@ module dut_system #(
     //wire [NUM_SOBELS-1:0] fifo_sobel_rd_en_arr; //right now, just grayscales- deal with sobels later
     //wire [NUM_SOBELS-1:0] fifo_sobel_wr_en_arr;
     
-    //these should have the same behavior, so just OR together their signals when it would be a problem
+    //these should have the same behavior, so just reduce their wires when it would be a problem (OR or AND, shouldn't matter)
     assign fifo_rgb_rd_en = |fifo_rgb_rd_en_arr;
     assign fifo_grayscale_wr_en = |fifo_grayscale_wr_en_arr;
 
@@ -170,8 +170,8 @@ module dut_system #(
     );
 
     fifo #(
-        .FIFO_DATA_WIDTH(FIFO_DWIDTH_OUT),
-        .FIFO_BUFFER_SIZE(FIFO_BUFFER_SIZE)
+        .FIFO_DATA_WIDTH(SOBEL_DWIDTH),
+        .FIFO_BUFFER_SIZE(SOBEL_BUFFER)
     ) fifo_sobel (
         .rd_clk(clock),
         .wr_clk(clock),

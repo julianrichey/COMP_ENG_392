@@ -4,7 +4,8 @@ vlib work
 vmap work work
 
 vlog -work work "../src/fifo.v"
-vlog -work work "../src/dut.v"
+vlog -work work "../src/grayscale.v"
+vlog -work work "../src/sobel.v"
 vlog -work work "../src/dut_system.v"
 vlog -work work "../src/testbench.v"
 

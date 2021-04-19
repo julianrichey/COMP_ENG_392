@@ -25,13 +25,11 @@ module dut_testbench();
     parameter [20*8-1:0] fifo_out_name = "copper_sobel.bmp";
     //parameter [119:0] tb_fifo_out_name = "tb_fifo_out.txt";
 
-    //TODO: deal with all DWIDTH stuff around here. also, when reading in file, do it 3 different times and concat for one input/cycle
-
     localparam integer bmp_width = 720;
     localparam integer bmp_height = 540;
     localparam integer bmp_header_size = 54;
-    localparam integer bmp_data_size = bmp_width*bmp_height*3;
-    localparam integer increment = DWIDTH_IN / 8;
+    localparam integer bytes_per_pixel = 3;
+    localparam integer bmp_data_size = bmp_width*bmp_height*bytes_per_pixel;
 
     parameter [63:0] clock_period = 100;
 
@@ -39,12 +37,12 @@ module dut_testbench();
     reg reset = 1'b0;
     reg hold_clock = 1'b0;
     
-    reg [DWIDTH_IN-1:0] fifo_in_din = 'sh0;
+    reg [RGB_DWIDTH-1:0] fifo_in_din = 'sh0;
     wire fifo_in_full;
     reg fifo_in_wr_en = 1'sh0;
     reg fifo_in_write_done = 1'sh0;
 
-    wire [DWIDTH_OUT-1:0] fifo_out_dout;
+    wire [SOBEL_DWIDTH-1:0] fifo_out_dout;
     wire fifo_out_empty;
     reg fifo_out_rd_en = 1'sh0;
     reg fifo_out_read_done = 1'sh0;
@@ -64,18 +62,18 @@ module dut_testbench();
     
     integer fifo_in_file;
     integer fifo_in_write_iter = 0;
-    reg [DWIDTH_IN-1:0] fifo_in_data_write;
+    reg [RGB_DWIDTH-1:0] fifo_in_data_write;
     
     integer fifo_out_file;
     //integer fifo_out_write_iter = 0;
     //integer tb_fifo_out_file;
     //integer fifo_out_read_iter = 0;
-    reg [DWIDTH_OUT-1:0] fifo_out_data_read = 'h0;
-    reg [DWIDTH_OUT-1:0] fifo_out_data_cmp = 'h0;
+    reg [SOBEL_DWIDTH-1:0] fifo_out_data_read = 'h0;
+    //reg [SOBEL_DWIDTH-1:0] fifo_out_data_cmp = 'h0;
 
     reg [7:0] bmp_header [0:bmp_header_size-1];
 
-    function [DWIDTH_OUT-1:0] to_01;
+    /*function [DWIDTH_OUT-1:0] to_01;
         input reg [DWIDTH_OUT-1:0] val;
         integer i;
         reg [DWIDTH_OUT-1:0] result;
@@ -91,6 +89,7 @@ module dut_testbench();
             to_01 = result;
         end
     endfunction
+    */
 
     dut_system #(
         .NUM_SOBELS(NUM_SOBELS),
@@ -104,12 +103,12 @@ module dut_testbench();
     ) dut_system_inst (
         .clock(clock),
         .reset(reset),
-        .fifo_in_din(fifo_in_din),
-        .fifo_in_full(fifo_in_full),
-        .fifo_in_wr_en(fifo_in_wr_en),
-        .fifo_out_dout(fifo_out_dout),
-        .fifo_out_empty(fifo_out_empty),
-        .fifo_out_rd_en(fifo_out_rd_en)
+        .fifo_rgb_din(fifo_in_din),
+        .fifo_rgb_full(fifo_in_full),
+        .fifo_rgb_wr_en(fifo_in_wr_en),
+        .fifo_sobel_dout(fifo_out_dout),
+        .fifo_sobel_empty(fifo_out_empty),
+        .fifo_sobel_rd_en(fifo_out_rd_en)
     );
 
     always 
@@ -175,16 +174,40 @@ module dut_testbench();
         //Initial 54 byte read for header
         bytes_read_header = $fread(bmp_header, fifo_in_file, 0, bmp_header_size);
 
-        for (j=0; j<bmp_data_size; j=j+increment) begin
+        for (j=0; j<bmp_data_size; j=j+bytes_per_pixel) begin
             wait( clock == 1'b1 );
             wait( clock == 1'b0 );
             if ( fifo_in_full == 1'b1 ) begin
                 fifo_in_wr_en <= 1'b0;
                 fifo_in_din <= 'h0;
             end else begin
+
+                //TODO: when reading in file, do it 3 different times and concat for one input/cycle
+
+                /*
+                thoughts
+                focus on case where NUM_SOBELS = 1
+                normally, sobel should to start with the center of the first matrix on 0,0
+                here, to populate shift_reg in sobel, this needs to start at -1,0
+                this means that the output needs to also ignore the first item of each row
+                the ends of rows are also a thing
+                for now, what if i just try it wrapping around? the edges will be messed up but it should technically work
+
+                1,2,3,721,722,723,1441,1442,1443
+                
+                j+0
+                j+720
+                j+1440
+
+
+
+                */
+
                 //this is formatted as follows:
                 //fread(reg_we_are_writing_data_to,filename_we_get_data_from,Start_location_of_data_in_file,How_much_data_we_are_reading)
-                bytes_read_data = $fread(fifo_in_data_write, fifo_in_file, bmp_header_size+(j*increment), increment);
+                bytes_read_data = $fread(fifo_in_data_write[24*1-1:24*0], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*0), bytes_per_pixel);
+                bytes_read_data = $fread(fifo_in_data_write[24*2-1:24*1], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*1), bytes_per_pixel);
+                bytes_read_data = $fread(fifo_in_data_write[24*3-1:24*2], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*2), bytes_per_pixel);
                 fifo_in_wr_en <= 1'b1;
                 fifo_in_din <= fifo_in_data_write;
             end
@@ -222,7 +245,7 @@ module dut_testbench();
 
         wait( fifo_out_empty == 1'b0);
         
-        for (k=0; k<bmp_data_size; k=k+increment) begin
+        for (k=0; k<bmp_data_size; k=k+bytes_per_pixel) begin
             wait( clock == 1'b1 );
             wait( clock == 1'b0 );
             if ( fifo_out_empty == 1'b1 ) begin
@@ -231,14 +254,7 @@ module dut_testbench();
             end else begin
                 fifo_out_rd_en <= 1'b1;
                 fifo_out_data_read = fifo_out_dout;
-                if (CONVERT_GRAYSCALE) begin
-                    $fwrite(fifo_out_file, "%c%c%c", fifo_out_data_read, fifo_out_data_read, fifo_out_data_read);
-                end else begin
-                    //modelsim gives warnings, but don't worry, this would never get synthesized if CONVERT_GRAYSCALE=0
-                    $fwrite(fifo_out_file, "%c", fifo_out_data_read[23:16]);
-                    $fwrite(fifo_out_file, "%c", fifo_out_data_read[15:8]);
-                    $fwrite(fifo_out_file, "%c", fifo_out_data_read[7:0]);
-                end
+                $fwrite(fifo_out_file, "%c%c%c", fifo_out_data_read, fifo_out_data_read, fifo_out_data_read);
             end
         end
         
