@@ -1,4 +1,3 @@
-
 `timescale 1 ns / 1 ns
 
 module grayscale #(
@@ -10,7 +9,7 @@ module grayscale #(
 
     //fifo in
     output reg fifo_in_rd_en, 
-    input [FIFO_DWIDTH_IN-1:0] fifo_in_dout, 
+    input [DWIDTH_IN-1:0] fifo_in_dout, 
     input fifo_in_empty,
 
     //fifo out

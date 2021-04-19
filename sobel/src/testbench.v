@@ -1,5 +1,3 @@
-
-
 `timescale 1 ns / 1 ns
 
 module dut_testbench();
@@ -12,16 +10,16 @@ module dut_testbench();
     localparam integer NUM_GRAYSCALES = NUM_SOBELS * 3; //for 3x3 sobel, each sobel needs 3 new grayscale pixels each cycle. written to shift reg
 
     //from memory to grayscale
-    localparam integer RGB_BUFFER = 2; //2 is min... for all so far? because 1 write and read per cycle
     localparam integer RGB_DWIDTH = 8 * 3 * NUM_GRAYSCALES; //1 byte/color, 3 colors/pixel, NUM_GRAYSCALES pixels/cycle
+    localparam integer RGB_BUFFER = 2; //2 is min... for all so far? because 1 write and read per cycle
 
     //from grayscale to sobel
-    localparam integer GRAYSCALE_BUFFER = 2;
     localparam integer GRAYSCALE_DWIDTH = 8 * NUM_GRAYSCALES; //each sobel receives 1 byte/cycle from each grayscale
+    localparam integer GRAYSCALE_BUFFER = 2;
 
     //from sobel to memory
-    localparam integer SOBEL_BUFFER = 2;
     localparam integer SOBEL_DWIDTH = 8 * NUM_SOBELS;
+    localparam integer SOBEL_BUFFER = 2;
     
     parameter [18*8-1:0] fifo_in_name = "copper_720_540.bmp";
     parameter [20*8-1:0] fifo_out_name = "copper_sobel.bmp";
@@ -57,6 +55,7 @@ module dut_testbench();
     integer errors = 0;
     integer warnings = 0;
 
+    //literally just to stop modelsim from giving warnings
     integer bytes_read_header;
     integer bytes_read_data;
 
@@ -96,12 +95,12 @@ module dut_testbench();
     dut_system #(
         .NUM_SOBELS(NUM_SOBELS),
         .NUM_GRAYSCALES(NUM_GRAYSCALES),
-        .RGB_BUFFER(RGB_BUFFER),
         .RGB_DWIDTH(RGB_DWIDTH),
-        .GRAYSCALE_BUFFER(GRAYSCALE_BUFFER),
+        .RGB_BUFFER(RGB_BUFFER),
         .GRAYSCALE_DWIDTH(GRAYSCALE_DWIDTH),
-        .SOBEL_BUFFER(SOBEL_BUFFER),
-        .SOBEL_DWIDTH(SOBEL_DWIDTH)
+        .GRAYSCALE_BUFFER(GRAYSCALE_BUFFER),
+        .SOBEL_DWIDTH(SOBEL_DWIDTH),
+        .SOBEL_BUFFER(SOBEL_BUFFER)
     ) dut_system_inst (
         .clock(clock),
         .reset(reset),

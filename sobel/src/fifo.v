@@ -1,3 +1,4 @@
+`timescale 1 ns / 1 ns
 
 `define CLOG2(x) \
     (x <= 2) ? 1 : \
@@ -8,9 +9,11 @@
     (x <= 64) ? 6 : \
     (x <= 128) ? 7 : \
     (x <= 256) ? 8 : \
+    (x <= 512) ? 9 : \
+    (x <= 1024) ? 10 : \
+    (x <= 2048) ? 11 : \
+    (x <= 4096) ? 12 : \
     -1
-
-
 
 module fifo #(
     parameter FIFO_BUFFER_SIZE = 0,

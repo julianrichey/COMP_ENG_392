@@ -41,56 +41,73 @@ e.g. pixels 1,721,1441 from testbench at same time in fifo_in_din[23:0], fifo_in
 module dut_system #(
     parameter integer NUM_SOBELS,
     parameter integer NUM_GRAYSCALES,
-    parameter integer RGB_BUFFER,
     parameter integer RGB_DWIDTH,
-    parameter integer GRAYSCALE_BUFFER,
+    parameter integer RGB_BUFFER,
     parameter integer GRAYSCALE_DWIDTH,
-    parameter integer SOBEL_BUFFER,
-    parameter integer SOBEL_DWIDTH
+    parameter integer GRAYSCALE_BUFFER,
+    parameter integer SOBEL_DWIDTH,
+    parameter integer SOBEL_BUFFER
 ) (
     input clock,
     input reset,
 
-    input fifo_in_wr_en, //write to first fifos
-    input [RGB_DWIDTH-1:0] fifo_in_din, //data to all first fifos
-    output fifo_in_full,
+    //rbg memory to rgb fifo
+    input fifo_rgb_wr_en,
+    input [RGB_DWIDTH-1:0] fifo_rgb_din,
+    output fifo_rgb_full,
 
-    input fifo_out_rd_en,
-    output [SOBEL_DWIDTH-1:0] fifo_out_dout,
-    output fifo_out_empty
+    //sobel fifo to sobel memory
+    input fifo_sobel_rd_en,
+    output [SOBEL_DWIDTH-1:0] fifo_sobel_dout,
+    output fifo_sobel_empty
 );
 
+    //rgb fifo to grayscales
+    wire fifo_rgb_rd_en;
+    wire [RGB_DWIDTH-1:0] fifo_rgb_dout;
+    wire fifo_rgb_empty;
 
-    wire [NUM_] fifo_in_wr_en;
-    input  wire [RGB_DWIDTH-1:0] fifo_in_din;
-    output wire fifo_in_full;
+    //grayscales to grayscale fifo
+    wire fifo_grayscale_wr_en;
+    wire [GRAYSCALE_DWIDTH-1:0] fifo_grayscale_din;
+    wire fifo_grayscale_full;
 
-    // output fifo
-    input  wire fifo_out_rd_en;
-    output wire [(SOBEL_DWIDTH - 1):0] fifo_out_dout;
-    output wire fifo_out_empty;
+    //grayscale fifo to sobel
+    wire fifo_grayscale_rd_en;
+    wire [GRAYSCALE_DWIDTH-1:0] fifo_grayscale_dout;
+    wire fifo_grayscale_empty;
+
+    //sobel to sobel fifo
+    wire fifo_sobel_wr_en;
+    wire [SOBEL_DWIDTH-1:0] fifo_sobel_din;
+    wire fifo_sobel_full;
+
+    //when multiple modules instantiated, they can't write to the same wire
+    wire [NUM_GRAYSCALES-1:0] fifo_rgb_rd_en_arr;
+    wire [NUM_GRAYSCALES-1:0] fifo_grayscale_wr_en_arr;
+    //wire [NUM_SOBELS-1:0] fifo_sobel_rd_en_arr; //right now, just grayscales- deal with sobels later
+    //wire [NUM_SOBELS-1:0] fifo_sobel_wr_en_arr;
+    
+    //these should have the same behavior, so just OR together their signals when it would be a problem
+    assign fifo_rgb_rd_en = |fifo_rgb_rd_en_arr;
+    assign fifo_grayscale_wr_en = |fifo_grayscale_wr_en_arr;
 
 
 
-
-    // local input fifo wires
-    wire fifo_in_rd_en;
-    wire [(FIFO_DWIDTH_IN - 1):0] fifo_in_dout;
-    wire fifo_in_empty;
-
-    // local output fifo wires
-    wire fifo_out_wr_en;
-    wire [(FIFO_DWIDTH_OUT - 1):0] fifo_out_din;
-    wire fifo_out_full;
 
 
     sobel #(
-        .
-        .
-        .
-        .
-    ) sobel_0 (
-
+        .DWIDTH_IN(GRAYSCALE_DWIDTH),
+        .DWIDTH_OUT(SOBEL_DWIDTH)
+    ) sobels (
+        .clock(clock),
+        .reset(reset),
+        .fifo_in_rd_en(fifo_grayscale_rd_en), //(will be >1 sobels vs 1 fifo)
+        .fifo_in_dout(fifo_grayscale_dout),
+        .fifo_in_empty(fifo_grayscale_empty),
+        .fifo_out_wr_en(fifo_sobel_wr_en), //(will be >1 sobels vs 1 fifo)
+        .fifo_out_din(fifo_sobel_din),
+        .fifo_out_full(fifo_sobel_full)
     );
 
     /*
@@ -98,61 +115,58 @@ module dut_system #(
     generate
         for (i=0; i<NUM_GRAYSCALES; i=i+1) begin : generate_grayscales
             grayscale #(
-
             ) grayscale_inst (
-
             );
         end
     endgenerate
     */
 
-    //I believe this syntax is identical to a generate?!
+    //for this syntax:
+    //when a connected wire is the same width as is defined in the module definition, the same wire is connected to all instances
+    //when a connected wire is a different width than is defined in the module definition, the indices will be spread out evenly across all instances
+
     grayscale #(
-        .CONVERT_GRAYSCALE(CONVERT_GRAYSCALE),
-        .FIFO_DWIDTH_IN(FIFO_DWIDTH_IN),
-        .FIFO_DWIDTH_OUT(FIFO_DWIDTH_OUT)
+        .DWIDTH_IN(RGB_DWIDTH),
+        .DWIDTH_OUT(GRAYSCALE_DWIDTH)
     ) grayscales[NUM_GRAYSCALES-1:0] (
         .clock(clock),
         .reset(reset),
-        .fifo_in_rd_en(fifo_in_rd_en),
-        .fifo_in_dout(fifo_in_dout),
-        .fifo_in_empty(fifo_in_empty),
-        .fifo_out_wr_en(fifo_out_wr_en),
-        .fifo_out_din(fifo_out_din),
-        .fifo_out_full(fifo_out_full)
+        .fifo_in_rd_en(fifo_rgb_rd_en_arr), //>1 grayscales vs 1 fifo
+        .fifo_in_dout(fifo_rgb_dout),
+        .fifo_in_empty(fifo_rgb_empty),
+        .fifo_out_wr_en(fifo_grayscale_wr_en_arr), //>1 grayscales vs 1 fifo
+        .fifo_out_din(fifo_grayscale_din),
+        .fifo_out_full(fifo_grayscale_full)
     );
 
-
-
-
     fifo #(
-        .FIFO_DATA_WIDTH(FIFO_DWIDTH_IN),
-        .FIFO_BUFFER_SIZE(FIFO_BUFFER_SIZE)
+        .FIFO_DATA_WIDTH(RGB_DWIDTH),
+        .FIFO_BUFFER_SIZE(RGB_BUFFER)
     ) fifo_rgb (
         .rd_clk(clock),
         .wr_clk(clock),
         .reset(reset),
-        .rd_en(fifo_in_rd_en),
-        .wr_en(fifo_in_wr_en),
-        .din(fifo_in_din),
-        .dout(fifo_in_dout),
-        .full(fifo_in_full),
-        .empty(fifo_in_empty)
+        .rd_en(fifo_rgb_rd_en),
+        .wr_en(fifo_rgb_wr_en),
+        .din(fifo_rgb_din),
+        .dout(fifo_rgb_dout),
+        .full(fifo_rgb_full),
+        .empty(fifo_rgb_empty)
     );
 
     fifo #(
-        .FIFO_DATA_WIDTH(FIFO_DWIDTH_OUT),
-        .FIFO_BUFFER_SIZE(FIFO_BUFFER_SIZE)
+        .FIFO_DATA_WIDTH(GRAYSCALE_DWIDTH),
+        .FIFO_BUFFER_SIZE(GRAYSCALE_BUFFER)
     ) fifo_grayscale (
         .rd_clk(clock),
         .wr_clk(clock),
         .reset(reset),
-        .rd_en(fifo_out_rd_en),
-        .wr_en(fifo_out_wr_en),
-        .din(fifo_out_din),
-        .dout(fifo_out_dout),
-        .full(fifo_out_full),
-        .empty(fifo_out_empty)
+        .rd_en(fifo_grayscale_rd_en),
+        .wr_en(fifo_grayscale_wr_en),
+        .din(fifo_grayscale_din),
+        .dout(fifo_grayscale_dout),
+        .full(fifo_grayscale_full),
+        .empty(fifo_grayscale_empty)
     );
 
     fifo #(
@@ -162,14 +176,12 @@ module dut_system #(
         .rd_clk(clock),
         .wr_clk(clock),
         .reset(reset),
-        .rd_en(fifo_out_rd_en),
-        .wr_en(fifo_out_wr_en),
-        .din(fifo_out_din),
-        .dout(fifo_out_dout),
-        .full(fifo_out_full),
-        .empty(fifo_out_empty)
+        .rd_en(fifo_sobel_rd_en),
+        .wr_en(fifo_sobel_wr_en),
+        .din(fifo_sobel_din),
+        .dout(fifo_sobel_dout),
+        .full(fifo_sobel_full),
+        .empty(fifo_sobel_empty)
     );
-
-
 
 endmodule

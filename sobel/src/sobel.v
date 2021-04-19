@@ -1,6 +1,4 @@
-
-`timescale 1 ns/1 ns
-
+`timescale 1 ns / 1 ns
 
 module sobel #(
     parameter integer DWIDTH_IN, //24 bits
@@ -20,7 +18,7 @@ module sobel #(
     input fifo_out_full
 );
     //bmps are stored row major, starting at the lower left corner. use x,y for which column, which row. so 0,1 is 1 right of lower left corner
-    //with this shfit_reg code, you can assume that, every cycle, you have the 3x3 grayscale input you want
+    //with this shift_reg code, you can assume that, every cycle, you have the 3x3 grayscale input you want
         //the [7:0] refers to which bit
         //the 1st [0:2] refers to y
         //the 2nd [0:2] refers to x
@@ -93,8 +91,11 @@ module sobel #(
             is_data_c = 1'b1;
             fifo_in_rd_en = 1'b1;
 
+            //temporary: using the middle pixel of each should perfectly reconstruct the grayscale image
+            data_c = shift_reg[1][1];
+
             //use 9 values in shift_reg to compute data_c here
-            // data_c = func(shift_reg)
+            //data_c = sobel_func(shift_reg)
         end
 
         if (fifo_out_full == 1'b0 && is_data == 1'b1) begin
