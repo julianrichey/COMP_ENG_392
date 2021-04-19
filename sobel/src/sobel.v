@@ -35,50 +35,19 @@ module sobel #(
             //shift_reg[2][2] is pixel 1444
 
     reg [7:0] shift_reg [0:2] [0:2];
-
+    reg [13:0] hor_val,vert_val;
     integer i,j;
-
-     /*
-    //Functions for sobel_func calculation, rn do not work
-     function [7:0] negative;
-        input [7:0] val;
-
-        begin
-            negative = ~val + 1;
-        end
-    endfunction
 
     function [13:0] abs;
         input [13:0] val;
 
         begin
-            abs = val[13] ? ~val + 1 : val;
+            abs = (val < 0) ? -val : val;
         end
     endfunction
 
-    function [13:0] sobel_func;
-        input reg [7:0] shift_reg [0:2] [0:2];
-        reg[8:0] val1,val2,val3,val4;
-        reg[13:0] hor_val,vert_val;
 
 
-        begin
-
-            //HORIZONTAL sobel calculation
-            val1 = negative(shift_reg[0][1]) << 1;
-            val2 = shift_reg[2][1] << 1
-            hor_val = negative(shift_reg[0][0]) + val1 + negative(shift_reg[0][2]) + shift_reg[2][0] + val2 + shift_reg[2][2];
-            //VERTICAL sobel calculation
-            val3 = negative(shift_reg[1][0]) << 1;
-            val4 = shift_reg[2][1] << 1
-            vert_val = negative(shift_reg[0][0]) + shift_reg[0][2] + val3 + val4 + negative(shift_reg[2][0]) + shift_reg[2][2];
-            sobel_func = (hor_val + vert_val) >> 1;
-        end
-    endfunction
-
-    */
-
-    //THIS IS BROKEN - just gives 0s
     
     always @(posedge clock) begin
         if (reset) begin
@@ -135,12 +104,50 @@ module sobel #(
             fifo_in_rd_en = 1'b1;
 
             //temporary: just something to confirm that this is all working as expected
-            data_c = ({4'h0,shift_reg[0][2]}+{4'h0,shift_reg[0][1]}+{4'h0,shift_reg[0][0]}+
-                      {4'h0,shift_reg[1][2]}+{4'h0,shift_reg[1][1]}+{4'h0,shift_reg[1][0]}+
-                      {4'h0,shift_reg[2][2]}+{4'h0,shift_reg[2][1]}+{4'h0,shift_reg[2][0]})/9;
+            //data_c = ({4'h0,shift_reg[0][2]}+{4'h0,shift_reg[0][1]}+{4'h0,shift_reg[0][0]}+
+            //          {4'h0,shift_reg[1][2]}+{4'h0,shift_reg[1][1]}+{4'h0,shift_reg[1][0]}+
+            //          {4'h0,shift_reg[2][2]}+{4'h0,shift_reg[2][1]}+{4'h0,shift_reg[2][0]})/9;
 
             //use 9 values in shift_reg to compute data_c here
-            //data_c = sobel_func(shift_reg)
+
+
+            //incoming shift_reg values are 8 bits
+            //need one extra bit to multiply by two
+            //need one extra bit to negate
+            //this means 10 bits
+            //if adding 6 10 bit values together, need 14 bits for final values
+            //make all inputs 14 bits so negation, *2, and addition happen properly
+
+        
+            // const int horizontal_operator[3][3] = {
+            //     { -1,  0,  1 },
+            //     { -2,  0,  2 },
+            //     { -1,  0,  1 }
+            // };
+
+            //horizontal sobel filter
+            hor_val = (-{6'h00, shift_reg[0][0]}) +
+                        (-({6'h00, shift_reg[0][1]} << 1)) +
+                        (-{6'h00, shift_reg[0][2]}) +
+                        {6'h00, shift_reg[2][0]} +
+                        ({6'h00, shift_reg[2][1]} << 1) +
+                        {6'h00, shift_reg[2][2]};
+
+            // const int vertical_operator[3][3] = {
+            //     { -1,  -2,  -1 },
+            //     {  0,   0,   0 },
+            //     {  1,   2,   1 }
+            // };
+
+            //vertical sobel filter
+            vert_val = {6'h00, shift_reg[0][0]} +
+                        ({6'h00, shift_reg[1][0]} << 1) +
+                        {6'h00, shift_reg[2][0]} +
+                        (-{6'h00, -shift_reg[0][2]}) +
+                        (-({6'h00, shift_reg[1][2]} << 1)) +
+                        (-{6'h00, -shift_reg[2][2]});
+
+            data_c = ({1'b0, abs(hor_val)} + {1'b0, abs(vert_val)}) >> 1;
         end
 
         if (fifo_out_full == 1'b0 && is_data == 1'b1) begin
