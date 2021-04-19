@@ -21,7 +21,9 @@ module dut_testbench();
     localparam integer SOBEL_DWIDTH = 8 * NUM_SOBELS;
     localparam integer SOBEL_BUFFER = 2;
     
-    parameter [18*8-1:0] fifo_in_name = "copper_720_540.bmp";
+    parameter [20*8-1:0] fifo_in_name_0 = "copper_720_540_0.bmp";
+    parameter [20*8-1:0] fifo_in_name_1 = "copper_720_540_1.bmp";
+    parameter [20*8-1:0] fifo_in_name_2 = "copper_720_540_2.bmp";
     parameter [20*8-1:0] fifo_out_name = "copper_sobel.bmp";
     //parameter [119:0] tb_fifo_out_name = "tb_fifo_out.txt";
 
@@ -60,9 +62,14 @@ module dut_testbench();
     reg [63:0] start_time = 0;
     reg [63:0] end_time = 0;
     
-    integer fifo_in_file;
+    integer fifo_in_file_0;
+    integer fifo_in_file_1;
+    integer fifo_in_file_2;
     integer fifo_in_write_iter = 0;
     reg [RGB_DWIDTH-1:0] fifo_in_data_write;
+    reg [RGB_DWIDTH/3-1:0] fifo_in_data_write_0;
+    reg [RGB_DWIDTH/3-1:0] fifo_in_data_write_1;
+    reg [RGB_DWIDTH/3-1:0] fifo_in_data_write_2;
     
     integer fifo_out_file;
     //integer fifo_out_write_iter = 0;
@@ -168,11 +175,15 @@ module dut_testbench();
         wait( clock == 1'b0 );
         wait( clock == 1'b1 );
         
-        $write("@ %0t: Loading file %s...\n", $time, fifo_in_name);
-        fifo_in_file = $fopen(fifo_in_name, "rb");
+        $write("@ %0t: Loading file %s...\n", $time, fifo_in_name_0);
+        fifo_in_file_0 = $fopen(fifo_in_name_0, "rb");
+        fifo_in_file_1 = $fopen(fifo_in_name_1, "rb");
+        fifo_in_file_2 = $fopen(fifo_in_name_2, "rb");
 
         //Initial 54 byte read for header
-        bytes_read_header = $fread(bmp_header, fifo_in_file, 0, bmp_header_size);
+        bytes_read_header = $fread(bmp_header, fifo_in_file_0, 0, bmp_header_size);
+        bytes_read_header = $fread(bmp_header, fifo_in_file_1, 0, bmp_header_size);
+        bytes_read_header = $fread(bmp_header, fifo_in_file_2, 0, bmp_header_size);
 
         for (j=0; j<bmp_data_size; j=j+bytes_per_pixel) begin
             wait( clock == 1'b1 );
@@ -193,27 +204,27 @@ module dut_testbench();
                 the ends of rows are also a thing
                 for now, what if i just try it wrapping around? the edges will be messed up but it should technically work
 
-                1,2,3,721,722,723,1441,1442,1443
-                
-                j+0
-                j+720
-                j+1440
-
-
 
                 */
 
                 //this is formatted as follows:
                 //fread(reg_we_are_writing_data_to,filename_we_get_data_from,Start_location_of_data_in_file,How_much_data_we_are_reading)
-                bytes_read_data = $fread(fifo_in_data_write[24*1-1:24*0], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*0), bytes_per_pixel);
-                bytes_read_data = $fread(fifo_in_data_write[24*2-1:24*1], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*1), bytes_per_pixel);
-                bytes_read_data = $fread(fifo_in_data_write[24*3-1:24*2], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*2), bytes_per_pixel);
+                //bytes_read_data = $fread(fifo_in_data_write[24*1-1:24*0], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*0), bytes_per_pixel);
+                //bytes_read_data = $fread(fifo_in_data_write[24*2-1:24*1], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*1), bytes_per_pixel);
+                //bytes_read_data = $fread(fifo_in_data_write[24*3-1:24*2], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*2), bytes_per_pixel);
+                
+                bytes_read_data = $fread(fifo_in_data_write_0, fifo_in_file_0, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*0), bytes_per_pixel);
+                bytes_read_data = $fread(fifo_in_data_write_1, fifo_in_file_1, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*0), bytes_per_pixel);
+                bytes_read_data = $fread(fifo_in_data_write_2, fifo_in_file_2, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*0), bytes_per_pixel);
+                fifo_in_data_write = {fifo_in_data_write_2, fifo_in_data_write_1, fifo_in_data_write_0};
+                fifo_in_din = fifo_in_data_write;
                 fifo_in_wr_en <= 1'b1;
-                fifo_in_din <= fifo_in_data_write;
             end
         end
         
-        $fclose(fifo_in_file);
+        $fclose(fifo_in_file_0);
+        $fclose(fifo_in_file_1);
+        $fclose(fifo_in_file_2);
         
         wait( clock == 1'b0 );
         wait( clock == 1'b1 );

@@ -126,8 +126,8 @@ module dut_system #(
     //when a connected wire is a different width than is defined in the module definition, the indices will be spread out evenly across all instances
 
     grayscale #(
-        .DWIDTH_IN(RGB_DWIDTH),
-        .DWIDTH_OUT(GRAYSCALE_DWIDTH)
+        .DWIDTH_IN(RGB_DWIDTH/NUM_GRAYSCALES),
+        .DWIDTH_OUT(GRAYSCALE_DWIDTH/NUM_GRAYSCALES)
     ) grayscales[NUM_GRAYSCALES-1:0] (
         .clock(clock),
         .reset(reset),
