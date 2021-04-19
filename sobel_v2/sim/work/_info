@@ -1,0 +1,126 @@
+m255
+K4
+z2
+!s11f vlog 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dC:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel/sim
+vdut_system
+Z1 !s110 1618858173
+!i10b 1
+!s100 JCaBik;8_J?KN;JcOz:P[1
+Z2 !s11b Dg1SIo80bB@j0V0VzS_@n1
+IDJMenmmELF5E?JA]fUW4b1
+Z3 VDg1SIo80bB@j0V0VzS_@n1
+R0
+w1618808853
+8../src/dut_system.v
+F../src/dut_system.v
+!i122 167
+L0 41 147
+Z4 OV;L;2020.1;71
+r1
+!s85 0
+31
+Z5 !s108 1618858173.000000
+!s107 ../src/dut_system.v|
+!s90 -reportprogress|300|-work|work|../src/dut_system.v|
+!i113 1
+Z6 o-work work
+Z7 tCvgOpt 0
+vdut_testbench
+R1
+!i10b 1
+!s100 SHg]NHddd;]zIZd7DAIg=0
+R2
+ID<Wbi1F7`C0fI3>17Hk]l1
+R3
+R0
+w1618858131
+8../src/testbench.v
+F../src/testbench.v
+!i122 168
+L0 3 326
+R4
+r1
+!s85 0
+31
+R5
+!s107 ../src/testbench.v|
+!s90 -reportprogress|300|-work|work|../src/testbench.v|
+!i113 1
+R6
+R7
+vfifo
+!s110 1618858172
+!i10b 1
+!s100 ?8UJVoj:[:^7JXKb^MaLP3
+R2
+IDjDHdk5QP]<ZQJzPe2_C@0
+R3
+R0
+w1618798463
+8../src/fifo.v
+F../src/fifo.v
+!i122 164
+L0 18 47
+R4
+r1
+!s85 0
+31
+!s108 1618858172.000000
+!s107 ../src/fifo.v|
+!s90 -reportprogress|300|-work|work|../src/fifo.v|
+!i113 1
+R6
+R7
+vgrayscale
+R1
+!i10b 1
+!s100 380E^_RE;lbA8AWH;79Al3
+R2
+IZ>@kBJP:M]O_`8g:][8d=3
+R3
+R0
+w1618798456
+8../src/grayscale.v
+F../src/grayscale.v
+!i122 165
+L0 3 64
+R4
+r1
+!s85 0
+31
+R5
+!s107 ../src/grayscale.v|
+!s90 -reportprogress|300|-work|work|../src/grayscale.v|
+!i113 1
+R6
+R7
+vsobel
+R1
+!i10b 1
+!s100 zzleIb6AUn[i8i?Z]><G;1
+R2
+IW7@iHZlKYPQ`Di9I5AV_V2
+R3
+R0
+w1618857684
+8../src/sobel.v
+F../src/sobel.v
+!i122 166
+L0 3 159
+R4
+r1
+!s85 0
+31
+R5
+!s107 ../src/sobel.v|
+!s90 -reportprogress|300|-work|work|../src/sobel.v|
+!i113 1
+R6
+R7
