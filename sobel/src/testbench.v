@@ -67,9 +67,6 @@ module dut_testbench();
     integer fifo_in_file_2;
     integer fifo_in_write_iter = 0;
     reg [RGB_DWIDTH-1:0] fifo_in_data_write;
-    reg [RGB_DWIDTH/3-1:0] fifo_in_data_write_0;
-    reg [RGB_DWIDTH/3-1:0] fifo_in_data_write_1;
-    reg [RGB_DWIDTH/3-1:0] fifo_in_data_write_2;
     
     integer fifo_out_file;
     //integer fifo_out_write_iter = 0;
@@ -213,10 +210,9 @@ module dut_testbench();
                 //bytes_read_data = $fread(fifo_in_data_write[24*2-1:24*1], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*1), bytes_per_pixel);
                 //bytes_read_data = $fread(fifo_in_data_write[24*3-1:24*2], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*2), bytes_per_pixel);
                 
-                bytes_read_data = $fread(fifo_in_data_write_0, fifo_in_file_0, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*0), bytes_per_pixel);
-                bytes_read_data = $fread(fifo_in_data_write_1, fifo_in_file_1, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*0), bytes_per_pixel);
-                bytes_read_data = $fread(fifo_in_data_write_2, fifo_in_file_2, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*0), bytes_per_pixel);
-                fifo_in_data_write = {fifo_in_data_write_2, fifo_in_data_write_1, fifo_in_data_write_0};
+                bytes_read_data = $fread(fifo_in_data_write[23:0], fifo_in_file_0, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*0), bytes_per_pixel);
+                bytes_read_data = $fread(fifo_in_data_write[47:24], fifo_in_file_1, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*1), bytes_per_pixel);
+                bytes_read_data = $fread(fifo_in_data_write[71:48], fifo_in_file_2, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*2), bytes_per_pixel);
                 fifo_in_din = fifo_in_data_write;
                 fifo_in_wr_en <= 1'b1;
             end
