@@ -38,6 +38,46 @@ module sobel #(
 
     integer i,j;
 
+     /*
+    //Functions for sobel_func calculation, rn do not work
+     function [7:0] negative;
+        input [7:0] val;
+
+        begin
+            negative = ~val + 1;
+        end
+    endfunction
+
+    function [13:0] abs;
+        input [13:0] val;
+
+        begin
+            abs = val[13] ? ~val + 1 : val;
+        end
+    endfunction
+
+    function [13:0] sobel_func;
+        input reg [7:0] shift_reg [0:2] [0:2];
+        reg[8:0] val1,val2,val3,val4;
+        reg[13:0] hor_val,vert_val;
+
+
+        begin
+
+            //HORIZONTAL sobel calculation
+            val1 = negative(shift_reg[0][1]) << 1;
+            val2 = shift_reg[2][1] << 1
+            hor_val = negative(shift_reg[0][0]) + val1 + negative(shift_reg[0][2]) + shift_reg[2][0] + val2 + shift_reg[2][2];
+            //VERTICAL sobel calculation
+            val3 = negative(shift_reg[1][0]) << 1;
+            val4 = shift_reg[2][1] << 1
+            vert_val = negative(shift_reg[0][0]) + shift_reg[0][2] + val3 + val4 + negative(shift_reg[2][0]) + shift_reg[2][2];
+            sobel_func = (hor_val + vert_val) >> 1;
+        end
+    endfunction
+
+    */
+
     //THIS IS BROKEN - just gives 0s
     
     always @(posedge clock) begin
