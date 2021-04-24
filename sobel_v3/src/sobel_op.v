@@ -4,10 +4,10 @@ module sobel_op #(
     parameter integer DWIDTH_IN = 72, //8*9 bits
     parameter integer DWIDTH_OUT = 8 //8 bits
 ) (
-    input clock,
-    input reset,
+    input wire clock,
+    input wire reset,
 
-    input [DWIDTH_IN-1:0] in,
+    input wire [DWIDTH_IN-1:0] in,
     output reg [DWIDTH_OUT-1:0] out
 );
 
