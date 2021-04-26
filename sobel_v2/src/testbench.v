@@ -2,34 +2,23 @@
 
 module dut_testbench();
 
-    //for now, not dealing with memory overlap. just do as many 'reads' as needed. will optimize later
-
-    //how many of each module must be instantiated
-    //NOTE: just using 1 sobel for now. will using parameter in generate blocks later
-    localparam integer NUM_SOBELS = 1; //vertical pixels is max (here, 540), 1 is min. 
-    localparam integer NUM_GRAYSCALES = NUM_SOBELS * 3; //for 3x3 sobel, each sobel needs 3 new grayscale pixels each cycle. written to shift reg
-
     //from memory to grayscale
-    localparam integer RGB_DWIDTH = 8 * 3 * NUM_GRAYSCALES; //1 byte/color, 3 colors/pixel, NUM_GRAYSCALES pixels/cycle
-    localparam integer RGB_BUFFER = 2; //2 is min... for all so far? because 1 write and read per cycle
+    localparam integer RGB_DWIDTH = 8 * 3;
+    localparam integer RGB_BUFFER = 2;
 
     //from grayscale to sobel
-    localparam integer GRAYSCALE_DWIDTH = 8 * NUM_GRAYSCALES; //each sobel receives 1 byte/cycle from each grayscale
+    localparam integer GRAYSCALE_DWIDTH = 8;
     localparam integer GRAYSCALE_BUFFER = 2;
 
     //from sobel to memory
-    localparam integer SOBEL_DWIDTH = 8 * NUM_SOBELS;
+    localparam integer SOBEL_DWIDTH = 8;
     localparam integer SOBEL_BUFFER = 2;
     
-    // parameter [20*8-1:0] fifo_in_name_0 = "copper_720_540_0.bmp";
-    // parameter [20*8-1:0] fifo_in_name_1 = "copper_720_540_1.bmp";
-    // parameter [20*8-1:0] fifo_in_name_2 = "copper_720_540_2.bmp";
-    // parameter [20*8-1:0] fifo_out_name = "copper_sobel.bmp";
+    parameter [18*8-1:0] fifo_in_name = "copper_720_540.bmp";
+    parameter [16*8-1:0] fifo_out_name = "copper_sobel.bmp";
 
-    parameter [29*8-1:0] fifo_in_name_0 = "brooklyn_bridge_720_540_0.bmp";
-    parameter [29*8-1:0] fifo_in_name_1 = "brooklyn_bridge_720_540_1.bmp";
-    parameter [29*8-1:0] fifo_in_name_2 = "brooklyn_bridge_720_540_2.bmp";
-    parameter [25*8-1:0] fifo_out_name = "brooklyn_bridge_sobel.bmp";
+    // parameter [27*8-1:0] fifo_in_name = "brooklyn_bridge_720_540.bmp";
+    // parameter [25*8-1:0] fifo_out_name = "brooklyn_bridge_sobel.bmp";
 
     //parameter [119:0] tb_fifo_out_name = "tb_fifo_out.txt";
 
@@ -68,9 +57,7 @@ module dut_testbench();
     reg [63:0] start_time = 0;
     reg [63:0] end_time = 0;
     
-    integer fifo_in_file_0;
-    integer fifo_in_file_1;
-    integer fifo_in_file_2;
+    integer fifo_in_file;
     integer fifo_in_write_iter = 0;
     reg [RGB_DWIDTH-1:0] fifo_in_data_write;
     
@@ -102,8 +89,8 @@ module dut_testbench();
     */
 
     dut_system #(
-        .NUM_SOBELS(NUM_SOBELS),
-        .NUM_GRAYSCALES(NUM_GRAYSCALES),
+        .IMG_WIDTH(bmp_width),
+        .IMG_HEIGHT(bmp_height),
         .RGB_DWIDTH(RGB_DWIDTH),
         .RGB_BUFFER(RGB_BUFFER),
         .GRAYSCALE_DWIDTH(GRAYSCALE_DWIDTH),
@@ -179,14 +166,10 @@ module dut_testbench();
         wait( clock == 1'b1 );
         
         $write("@ %0t: Loading file %s...\n", $time, fifo_in_name_0);
-        fifo_in_file_0 = $fopen(fifo_in_name_0, "rb");
-        fifo_in_file_1 = $fopen(fifo_in_name_1, "rb");
-        fifo_in_file_2 = $fopen(fifo_in_name_2, "rb");
+        fifo_in_file = $fopen(fifo_in_name, "rb");
 
         //Initial 54 byte read for header
-        bytes_read_header = $fread(bmp_header, fifo_in_file_0, 0, bmp_header_size);
-        bytes_read_header = $fread(bmp_header, fifo_in_file_1, 0, bmp_header_size);
-        bytes_read_header = $fread(bmp_header, fifo_in_file_2, 0, bmp_header_size);
+        bytes_read_header = $fread(bmp_header, fifo_in_file, 0, bmp_header_size);
 
         for (j=0; j<bmp_data_size; j=j+bytes_per_pixel) begin
             wait( clock == 1'b1 );
@@ -195,30 +178,7 @@ module dut_testbench();
                 fifo_in_wr_en <= 1'b0;
                 fifo_in_din <= 'h0;
             end else begin
-
-                //TODO: when reading in file, do it 3 different times and concat for one input/cycle
-
-                /*
-                thoughts
-                focus on case where NUM_SOBELS = 1
-                normally, sobel should to start with the center of the first matrix on 0,0
-                here, to populate shift_reg in sobel, this needs to start at -1,0
-                this means that the output needs to also ignore the first item of each row
-                the ends of rows are also a thing
-                for now, what if i just try it wrapping around? the edges will be messed up but it should technically work
-
-
-                */
-
-                //this is formatted as follows:
-                //fread(reg_we_are_writing_data_to,filename_we_get_data_from,Start_location_of_data_in_file,How_much_data_we_are_reading)
-                //bytes_read_data = $fread(fifo_in_data_write[24*1-1:24*0], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*0), bytes_per_pixel);
-                //bytes_read_data = $fread(fifo_in_data_write[24*2-1:24*1], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*1), bytes_per_pixel);
-                //bytes_read_data = $fread(fifo_in_data_write[24*3-1:24*2], fifo_in_file, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*2), bytes_per_pixel);
-                
-                bytes_read_data = $fread(fifo_in_data_write[23:0], fifo_in_file_0, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*0), bytes_per_pixel);
-                bytes_read_data = $fread(fifo_in_data_write[47:24], fifo_in_file_1, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*1), bytes_per_pixel);
-                bytes_read_data = $fread(fifo_in_data_write[71:48], fifo_in_file_2, bmp_header_size+(j*bytes_per_pixel)+(720*bytes_per_pixel*2), bytes_per_pixel);
+                bytes_read_data = $fread(fifo_in_data_write[23:0], fifo_in_file, bmp_header_size+(j*bytes_per_pixel), bytes_per_pixel);
                 fifo_in_din = fifo_in_data_write;
                 fifo_in_wr_en <= 1'b1;
             end

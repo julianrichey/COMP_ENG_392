@@ -5,71 +5,40 @@
 # vmap work work 
 # Modifying modelsim.ini
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 13:49:32 on Apr 19,2021
+# Start time: 15:29:07 on Apr 26,2021
 # vlog -reportprogress 300 -work work ../src/fifo.v 
 # -- Compiling module fifo
 # 
 # Top level modules:
 # 	fifo
-# End time: 13:49:32 on Apr 19,2021, Elapsed time: 0:00:00
+# End time: 15:29:07 on Apr 26,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 13:49:33 on Apr 19,2021
+# Start time: 15:29:07 on Apr 26,2021
 # vlog -reportprogress 300 -work work ../src/grayscale.v 
 # -- Compiling module grayscale
 # 
 # Top level modules:
 # 	grayscale
-# End time: 13:49:33 on Apr 19,2021, Elapsed time: 0:00:00
+# End time: 15:29:07 on Apr 26,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 13:49:33 on Apr 19,2021
+# Start time: 15:29:07 on Apr 26,2021
 # vlog -reportprogress 300 -work work ../src/sobel.v 
 # -- Compiling module sobel
-# 
-# Top level modules:
-# 	sobel
-# End time: 13:49:33 on Apr 19,2021, Elapsed time: 0:00:00
-# Errors: 0, Warnings: 0
-# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 13:49:33 on Apr 19,2021
-# vlog -reportprogress 300 -work work ../src/dut_system.v 
-# -- Compiling module dut_system
-# 
-# Top level modules:
-# 	dut_system
-# End time: 13:49:33 on Apr 19,2021, Elapsed time: 0:00:00
-# Errors: 0, Warnings: 0
-# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 13:49:33 on Apr 19,2021
-# vlog -reportprogress 300 -work work ../src/testbench.v 
-# -- Compiling module dut_testbench
-# 
-# Top level modules:
-# 	dut_testbench
-# End time: 13:49:33 on Apr 19,2021, Elapsed time: 0:00:00
-# Errors: 0, Warnings: 0
-# vsim "+notimingchecks" -L work work.dut_testbench -wlf testbench.wlf 
-# Start time: 13:49:33 on Apr 19,2021
-# Loading work.dut_testbench
-# Loading work.dut_system
-# Loading work.sobel
-# Loading work.fifo
-# Loading work.grayscale
-# 
-# @ 300: Beginning simulation...
-# @ 300: Loading file brooklyn_bridge_720_540_0.bmp...
-# @ 300: Writing file brooklyn_bridge_sobel.bmp...
-# @ 38880800: Simulation completed in 388805 cycles.
-# 
-# 
-# Total simulation cycle count: 388808
-# 
-# Total warning count: 0
-# Total error count: 0
-# 
-# ** Note: $stop    : ../src/testbench.v(169)
-#    Time: 38880800 ns  Iteration: 2  Instance: /dut_testbench
-# Break in NamedBeginStat tb_process at ../src/testbench.v line 169
-# End time: 13:57:00 on Apr 19,2021, Elapsed time: 0:07:27
-# Errors: 0, Warnings: 0
+# ** Error: ../src/sobel.v(52): (vlog-2110) Illegal reference to memory "data".
+# ** Error: ../src/sobel.v(52): (vlog-2110) Illegal reference to net array "#implicit-wire#0".
+# ** Error: ../src/sobel.v(52): (vlog-2110) Illegal reference to memory "data".
+# ** Error: ../src/sobel.v(70): (vlog-2110) Illegal reference to memory "shift_reg".
+# ** Error: ../src/sobel.v(70): Illegal LHS of assignment.
+# ** Error: ../src/sobel.v(70): (vlog-2110) Illegal reference to memory "shift_reg_c".
+# ** Error: ../src/sobel.v(79): (vlog-2110) Illegal reference to memory "shift_reg_c".
+# ** Error: ../src/sobel.v(79): Illegal LHS of assignment.
+# ** Error: ../src/sobel.v(79): (vlog-2110) Illegal reference to memory "shift_reg".
+# End time: 15:29:07 on Apr 26,2021, Elapsed time: 0:00:00
+# Errors: 9, Warnings: 0
+# ** Error: C:/quartus_lite_modelsim/modelsim_ase/win32aloem/vlog failed.
+# Error in macro ./sim.do line 8
+# C:/quartus_lite_modelsim/modelsim_ase/win32aloem/vlog failed.
+#     while executing
+# "vlog -work work "../src/sobel.v""

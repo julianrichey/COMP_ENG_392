@@ -5,9 +5,7 @@ rgb fifo (width=24, depth=2)
 grayscale
 grayscale fifo (width=8, depth=2)
 sobel, sobel_op
-sobel fifo
-
-
+sobel fifo (width=8, depth=2)
 */
 
 `timescale 1 ns / 1 ns
@@ -15,7 +13,6 @@ sobel fifo
 module dut_system #(
     parameter integer IMG_WIDTH,
     parameter integer IMG_HEIGHT,
-
     parameter integer RGB_DWIDTH,
     parameter integer RGB_BUFFER,
     parameter integer GRAYSCALE_DWIDTH,
@@ -104,17 +101,19 @@ module dut_system #(
     );
 
     sobel #(
+        .DWIDTH_IN(GRAYSCALE_DWIDTH),
+        .DWIDTH_OUT(SOBEL_DWIDTH)
         .IMG_WIDTH(IMG_HEIGHT),
         .IMG_HEIGHT(IMG_WIDTH)
     ) sobel_0 (
         .clock(clock),
         .reset(reset),
-        .fifo_in_rd_en(fifo_grayscale_rd_en),
-        .fifo_in_dout(fifo_grayscale_dout),
-        .fifo_in_empty(fifo_grayscale_empty),
-        .fifo_out_wr_en(fifo_sobel_wr_en),
-        .fifo_out_din(fifo_sobel_din),
-        .fifo_out_full(fifo_sobel_full)
+        .in_rd_en(fifo_grayscale_rd_en),
+        .in_dout(fifo_grayscale_dout),
+        .in_empty(fifo_grayscale_empty),
+        .out_wr_en(fifo_sobel_wr_en),
+        .out_din(fifo_sobel_din),
+        .out_full(fifo_sobel_full)
     );
 
     fifo #(

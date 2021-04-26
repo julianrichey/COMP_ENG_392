@@ -56,46 +56,46 @@ R5
 R6
 R7
 vfifo
-!s110 1618858172
+Z8 !s110 1619468947
 !i10b 1
 !s100 ?8UJVoj:[:^7JXKb^MaLP3
 R2
 IDjDHdk5QP]<ZQJzPe2_C@0
 R3
-R0
-w1618798463
+Z9 dC:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim
+Z10 w1618871479
 8../src/fifo.v
 F../src/fifo.v
-!i122 164
+!i122 171
 L0 18 47
 R4
 r1
 !s85 0
 31
-!s108 1618858172.000000
+Z11 !s108 1619468947.000000
 !s107 ../src/fifo.v|
 !s90 -reportprogress|300|-work|work|../src/fifo.v|
 !i113 1
 R6
 R7
 vgrayscale
-R1
+R8
 !i10b 1
 !s100 380E^_RE;lbA8AWH;79Al3
 R2
 IZ>@kBJP:M]O_`8g:][8d=3
 R3
-R0
-w1618798456
+R9
+R10
 8../src/grayscale.v
 F../src/grayscale.v
-!i122 165
+!i122 172
 L0 3 64
 R4
 r1
 !s85 0
 31
-R5
+R11
 !s107 ../src/grayscale.v|
 !s90 -reportprogress|300|-work|work|../src/grayscale.v|
 !i113 1
