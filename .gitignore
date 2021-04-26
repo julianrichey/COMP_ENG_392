@@ -4,25 +4,10 @@
 *.ini
 *.wlf
 
-**/transcript
-**/_info
-**/_vmake
+transcript
+_info
+_vmake
 
 grayscale/sim/copper_grayscale.bmp
 sobel/sim/copper_sobel.bmp
 sobel/sim/brooklyn_bridge_sobel.bmp
-
-
-
-
-
-
-#grayscale/sim/transcript
-#grayscale/sim/work/_info
-#grayscale/sim/work/_vmake
-
-#sobel/sim/transcript
-#sobel/sim/work/_info
-#sobel/sim/work/_vmake
-
-#sobel_v3/sim/transcript
