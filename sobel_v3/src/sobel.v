@@ -32,7 +32,7 @@ module sobel #(
 
     integer i,j;
 
-    reg[1:0] state,next_state;
+    reg [1:0] state,next_state;
 
     localparam s0 = 2'b00;
     localparam s1 = 2'b01;
@@ -45,6 +45,7 @@ module sobel #(
         .in(data),
         .out(grad)
     );
+
     always @(posedge clock, posedge reset) begin
         if (reset == 1'b1) begin
             x <= 'b0;
@@ -64,78 +65,70 @@ module sobel #(
         end
     end
 
-    //always @(state,in_empty,in_dout,out_full,x,y,shift_reg,count) begin
-    always @(*) begin
-        next_state <= state;
-        x_c <= x;
-        y_c <= y;
-        shift_reg_c <= shift_reg;
-        in_rd_en <= 1'b0;
-        out_wr_en <= 1'b0;
-        out_din <= grad;
-        count_c <= count;
+    always @* begin
+        next_state = state;
+        x_c = x;
+        y_c = y;
+        shift_reg_c = shift_reg;
+        in_rd_en = 1'b0;
+        out_wr_en = 1'b0;
+        out_din = grad;
+        count_c = count;
 
-
-
-
-        for(i=0;i<3;i=i+1) begin
+        for (i=0;i<3;i=i+1) begin
             for(j=0;j<3;j=j+1) begin
-                data[i*3 + j] <= shift_reg[i*IMG_WIDTH + j];
+                data[i*3 + j] = shift_reg[i*IMG_WIDTH + j];
             end
         end
 
-        case(state) 
-        s0: begin
-            x_c <= 'b0;
-            y_c <= 'b0;
-            if(in_empty == 1'b0) begin
-                in_rd_en <= 1'b1;
-                for(i=REG_SIZE-1;i>0;i=i-1) begin
-                shift_reg_c[i] <= shift_reg[i-1]; 
+        case (state)
+            s0: begin
+                x_c = 'b0;
+                y_c = 'b0;
+                if (in_empty == 1'b0) begin
+                    in_rd_en = 1'b1;
+                    for (i=REG_SIZE-1; i>0; i=i-1) begin
+                        shift_reg_c[i] = shift_reg[i-1]; 
+                    end
+                    shift_reg_c[0] = in_dout;
+                    count_c = count + 16'b1;
+                    if(count == REG_SIZE - 1) begin
+                        next_state = s1;
+                    end
                 end
-                shift_reg_c[0] <= in_dout;
-                count_c <= count + 16'b1;
-                if(count == REG_SIZE - 1) begin
-                    next_state <= s1;
+
+            end
+            s1: begin
+                if(in_empty == 1'b0) begin
+                    in_rd_en = 1'b1;
+                    for(i=REG_SIZE-1;i>0;i=i-1) begin
+                        shift_reg_c[i] = shift_reg[i-1]; 
+                    end
+                    shift_reg_c[0] = in_dout;
+                    x_c = x + 12'b1;
+                    if(y == IMG_HEIGHT - 1 && x == IMG_WIDTH - 1) begin
+                        y_c = 'b0;
+                        x_c = 'b0;
+                    end else if(x == IMG_WIDTH - 1) begin
+                        x_c = 'b0;
+                        y_c = y +12'b1;
+                    end
+                    next_state = s2;
                 end
             end
-
-        end
-        s1: begin
-            if(in_empty == 1'b0) begin
-                in_rd_en <= 1'b1;
-                for(i=REG_SIZE-1;i>0;i=i-1) begin
-                	shift_reg_c[i] <= shift_reg[i-1]; 
+            s2: begin
+                if(out_full == 1'b0) begin
+                    //out_din = grad;
+                    out_wr_en = 1'b1;
+                    next_state = s1;
                 end
-                shift_reg_c[0] <= in_dout;
-                x_c <= x + 12'b1;
-                if(y == IMG_HEIGHT - 1 && x == IMG_WIDTH - 1) begin
-                    y_c <= 'b0;
-                    x_c <= 'b0;
-                end else if(x == IMG_WIDTH - 1) begin
-                    x_c <= 'b0;
-                    y_c <= y +12'b1;
-                end
-                next_state <= s2;
             end
-        end
-        s2: begin
-            if(out_full == 1'b0) begin
-                //out_din <= grad;
-                out_wr_en <= 1'b1;
-                next_state <= s1;
+            default: begin
+                x_c = 'b0;
+                y_c = 'b0;
+                //shift_reg_c = 0//put something here
+                next_state = s0;
             end
-        end
-        default: begin
-            x_c <= 'b0;
-            
-            y_c <= 'b0;
-            //shift_reg_c <= 0//put something here
-            next_state <= s0;
-        end
-
-    endcase
-    
-   end
-
+        endcase
+    end
 endmodule

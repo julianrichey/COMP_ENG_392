@@ -1,158 +1,134 @@
 `timescale 1 ns / 1 ns
 
 module sobel #(
-    parameter integer DWIDTH_IN, //24 bits
-    parameter integer DWIDTH_OUT //8 bits
-) (
-    input clock,
-    input reset,
+    parameter integer IMG_WIDTH = 720, //8 bits
+    parameter integer IMG_HEIGHT = 540 //8*9 bits
+)(
+    input wire clock,
+    input wire reset,
 
     //fifo in
-    output reg fifo_in_rd_en,
-    input [DWIDTH_IN-1:0] fifo_in_dout, //{1443, 723, 3}, i.e. larget index will grab largest pixel number
-    input fifo_in_empty,
+    output reg in_rd_en,
+    input wire [7:0] in_dout, //{1443, 723, 3}, i.e. larget index will grab largest pixel number
+    input wire in_empty,
 
     //fifo out
-    output reg fifo_out_wr_en,
-    output reg [DWIDTH_OUT-1:0] fifo_out_din,
-    input fifo_out_full
+    output reg out_wr_en,
+    output reg [7:0] out_din,
+    input wire out_full
 );
-    //bmps are stored row major, starting at the lower left corner. use x,y for which column, which row. so 0,1 is 1 right of lower left corner
-    //with this shift_reg code, you can assume that, every cycle, you have the 3x3 grayscale input you want
-        //the [7:0] refers to which bit
-        //the 1st [0:2] refers to y
-        //the 2nd [0:2] refers to x
-        //so, shift_reg[1][2][6] refers to the 7th bit of the pixel at x,y coords 1,2 within the matrix if coords are 0 indexed
-    //given the matrix of pixels 1,2,3,721,722,723,1441,1442,1443
-        //on the bmp, these are the following, where x is the lower left hand corner
-            // 000000
-            // 011100
-            // 011100
-            // x11100
-        //shift_reg accesses these as follows
-            //shift_reg[1][0] is pixel 2
-            //shift_reg[0][1] is pixel 721
-            //shift_reg[2][2] is pixel 1444
 
-    reg [7:0] shift_reg [0:2] [0:2];
-    reg [13:0] hor_grad,vert_grad,v;
+//DWIDTH_IN = 8
+    localparam integer REG_SIZE = IMG_WIDTH*2 + 3; //REG_SIZE should be 1443(720*2 + 3)
+
+    reg [7:0] shift_reg [0:REG_SIZE - 1];
+    reg [7:0] shift_reg_c [0:REG_SIZE - 1];
+    wire [7:0] grad;
+    //coordinates in our image
+    reg [12:0] x,x_c,y,y_c; //Not sure how big these need to be or even if they are the same size
+
+    reg [7:0] data [0:8];
+    reg [15:0] count,count_c;
+
     integer i,j;
 
-    function [13:0] abs;
-        input [13:0] val;
+    reg [1:0] state,next_state;
 
-        begin
-            abs = (val < 0) ? -val : val;
+    localparam s0 = 2'b00;
+    localparam s1 = 2'b01;
+    localparam s2 = 2'b10;
+    localparam s3 = 2'b11;
+
+    sobel_op sobel_1( 
+        .clock(clock),
+        .reset(reset),
+        .in(data),
+        .out(grad)
+    );
+
+    always @(posedge clock, posedge reset) begin
+        if (reset == 1'b1) begin
+            x <= 'b0;
+            y <= 'b0;
+            count <= 'b0;
+            for(i=0;i<REG_SIZE;i=i+1) begin
+                shift_reg[i] <= 'b0; 
+            end
+            state <= s0;
+
+        end else if (clock == 1'b1) begin
+            count <= count_c;
+            x <= x_c;
+            y <= y_c;
+            shift_reg <= shift_reg_c;
+            state <= next_state;
         end
-    endfunction
-    
-    always @(posedge clock) begin
-        if (reset) begin
-            for (i=0; i<3; i=i+1) begin
-                for (j=0; j<3; j=j+1) begin
-                    shift_reg[i][j] <= 8'h00;
+    end
+
+    always @* begin
+        next_state = state;
+        x_c = x;
+        y_c = y;
+        shift_reg_c = shift_reg;
+        in_rd_en = 1'b0;
+        out_wr_en = 1'b0;
+        out_din = grad;
+        count_c = count;
+
+        for (i=0;i<3;i=i+1) begin
+            for(j=0;j<3;j=j+1) begin
+                data[i*3 + j] = shift_reg[i*IMG_WIDTH + j];
+            end
+        end
+
+        case (state)
+            s0: begin
+                x_c = 'b0;
+                y_c = 'b0;
+                if (in_empty == 1'b0) begin
+                    in_rd_en = 1'b1;
+                    for (i=REG_SIZE-1; i>0; i=i-1) begin
+                        shift_reg_c[i] = shift_reg[i-1]; 
+                    end
+                    shift_reg_c[0] = in_dout;
+                    count_c = count + 16'b1;
+                    if(count == REG_SIZE - 1) begin
+                        next_state = s1;
+                    end
+                end
+
+            end
+            s1: begin
+                if(in_empty == 1'b0) begin
+                    in_rd_en = 1'b1;
+                    for(i=REG_SIZE-1;i>0;i=i-1) begin
+                        shift_reg_c[i] = shift_reg[i-1]; 
+                    end
+                    shift_reg_c[0] = in_dout;
+                    x_c = x + 12'b1;
+                    if(y == IMG_HEIGHT - 1 && x == IMG_WIDTH - 1) begin
+                        y_c = 'b0;
+                        x_c = 'b0;
+                    end else if(x == IMG_WIDTH - 1) begin
+                        x_c = 'b0;
+                        y_c = y +12'b1;
+                    end
+                    next_state = s2;
                 end
             end
-        end else begin
-            // for (i=0; i<3; i=i+1) begin
-            //     for (j=0; j<3; j=j+1) begin
-            //         shift_reg[i][j] <= (i<2) ? shift_reg[i+1][j] : fifo_in_dout[8*j +: 8];  
-            //     end
-            // end
-            //should do the following:
-            shift_reg[0][0] <= shift_reg[1][0];
-            shift_reg[1][0] <= shift_reg[2][0];
-            shift_reg[2][0] <= fifo_in_dout[7:0];
-            shift_reg[0][1] <= shift_reg[1][1];
-            shift_reg[1][1] <= shift_reg[2][1];
-            shift_reg[2][1] <= fifo_in_dout[15:8];
-            shift_reg[0][2] <= shift_reg[1][2];
-            shift_reg[1][2] <= shift_reg[2][2];
-            shift_reg[2][2] <= fifo_in_dout[23:16];
-        end
+            s2: begin
+                if(out_full == 1'b0) begin
+                    //out_din = grad;
+                    out_wr_en = 1'b1;
+                    next_state = s1;
+                end
+            end
+            default: begin
+                x_c = 'b0;
+                y_c = 'b0;
+                //shift_reg_c = 0//put something here
+                next_state = s0;
+            end
+        endcase
     end
-    
-
-    reg [DWIDTH_OUT-1:0] data, data_c;
-    reg is_data, is_data_c;
-
-    always @(posedge clock) begin
-        if (reset) begin
-            fifo_in_rd_en <= 1'b0;
-            fifo_out_wr_en <= 1'b0;
-            fifo_out_din <= 8'h00;
-            is_data <= 1'b0;
-        end else begin
-            data <= data_c;
-            is_data <= is_data_c;
-        end
-    end
-
-    always @* begin : sobel_computation
-        //default values
-        data_c = data;
-        fifo_in_rd_en = 1'b0;
-        fifo_out_wr_en = 1'b0;
-        fifo_out_din = data;
-        is_data_c = 1'b0;
-
-        if (fifo_in_empty == 1'b0) begin
-            is_data_c = 1'b1;
-            fifo_in_rd_en = 1'b1;
-
-            //temporary: just something to confirm that this is all working as expected
-            //data_c = ({4'h0,shift_reg[0][2]}+{4'h0,shift_reg[0][1]}+{4'h0,shift_reg[0][0]}+
-            //          {4'h0,shift_reg[1][2]}+{4'h0,shift_reg[1][1]}+{4'h0,shift_reg[1][0]}+
-            //          {4'h0,shift_reg[2][2]}+{4'h0,shift_reg[2][1]}+{4'h0,shift_reg[2][0]})/9;
-
-            //use 9 values in shift_reg to compute data_c here
-
-
-            //incoming shift_reg values are 8 bits
-            //need one extra bit to multiply by two
-            //need one extra bit to negate
-            //this means 10 bits
-            //if adding 6 10 bit values together, need 14 bits for final values
-            //make all inputs 14 bits so negation, *2, and addition happen properly
-
-        
-            // const int horizontal_operator[3][3] = {
-            //     { -1,  0,  1 },
-            //     { -2,  0,  2 },
-            //     { -1,  0,  1 }
-            // };
-
-            // horizontal_gradient += in_data[j][i] * horizontal_operator[i][j];
-
-            hor_grad = (-{6'h00, shift_reg[0][0]}) +
-                       (-({6'h00, shift_reg[1][0]} << 1)) +
-                       (-{6'h00, shift_reg[2][0]}) +
-                       {6'h00, shift_reg[0][2]} +
-                       ({6'h00, shift_reg[1][2]} << 1) +
-                       {6'h00, shift_reg[2][2]};
-
-            // const int vertical_operator[3][3] = {
-            //     { -1,  -2,  -1 },
-            //     {  0,   0,   0 },
-            //     {  1,   2,   1 }
-            // };
-
-            // vertical_gradient += in_data[j][i] * vertical_operator[i][j];
-
-            vert_grad = {6'h00, shift_reg[0][0]} +
-                        ({6'h00, shift_reg[0][1]} << 1) +
-                        {6'h00, shift_reg[0][2]} +
-                        (-{6'h00, shift_reg[2][0]}) +
-                        (-({6'h00, shift_reg[2][1]} << 1)) +
-                        (-{6'h00, shift_reg[2][2]});
-
-            v = ({1'b0, abs(hor_grad)} + {1'b0, abs(vert_grad)}) >> 1;
-            data_c = ((v > 255) ? 255 : v);
-        end
-
-        if (fifo_out_full == 1'b0 && is_data == 1'b1) begin
-            fifo_out_wr_en = 1'b1;
-        end
-    end
-
 endmodule
