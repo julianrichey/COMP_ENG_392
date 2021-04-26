@@ -1,3 +1,25 @@
+/*
+1. figure out current errors
+    problems with data and shift reg
+2. verify sobel against c output
+    add conditions for edges, make sure padding works
+3. parameterize this to hell, then verify sobel again
+    in, out widths
+    3x3, 5x5, 7x7, 9x9, 11x11 and the padding that has to happen for each
+    instantiate sobel_op only based on a parameter
+4. write a 'gaussian_op'
+    this file should be exact same, just instantiate a different module
+5. verify gaussian against c output
+6. parameterize stride
+    might be easy or hard... not sure yet. dont worry about until later
+7. make sure this works in a loop of prologue->image->epilogue to process multiple frames
+
+
+
+*/
+
+
+
 `timescale 1 ns / 1 ns
 
 module sobel #(
