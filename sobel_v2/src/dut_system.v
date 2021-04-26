@@ -4,8 +4,6 @@ architecture
 rgb fifo (width=24, depth=2)
 grayscale
 grayscale fifo (width=8, depth=2)
-padder
-padder fifo (width=8, depth=1443ish?)
 sobel, sobel_op
 sobel fifo
 
@@ -15,12 +13,13 @@ sobel fifo
 `timescale 1 ns / 1 ns
 
 module dut_system #(
+    parameter integer IMG_WIDTH,
+    parameter integer IMG_HEIGHT,
+
     parameter integer RGB_DWIDTH,
     parameter integer RGB_BUFFER,
     parameter integer GRAYSCALE_DWIDTH,
     parameter integer GRAYSCALE_BUFFER,
-    parameter integer PADDER_DWIDTH,
-    parameter integer PADDER_BUFFER,
     parameter integer SOBEL_DWIDTH,
     parameter integer SOBEL_BUFFER
 ) (
@@ -48,20 +47,10 @@ module dut_system #(
     wire [GRAYSCALE_DWIDTH-1:0] fifo_grayscale_din;
     wire fifo_grayscale_full;
 
-    //grayscale fifo to padder
+    //grayscale fifo to sobel
     wire fifo_grayscale_rd_en;
     wire [GRAYSCALE_DWIDTH-1:0] fifo_grayscale_dout;
     wire fifo_grayscale_empty;
-
-    //padder to padder fifo
-    wire fifo_padder_wr_en;
-    wire [PADDER_DWIDTH-1:0] fifo_padder_din;
-    wire fifo_padder_full;
-
-    //padder fifo to sobel
-    wire fifo_padder_rd_en;
-    wire [PADDER_DWIDTH-1:0] fifo_padder_dout;
-    wire fifo_padder_empty;
 
     //sobel to sobel fifo
     wire fifo_sobel_wr_en;
@@ -114,44 +103,15 @@ module dut_system #(
         .empty(fifo_grayscale_empty)
     );
 
-    padder #(
-        .DWIDTH_IN(GRAYSCALE_DWIDTH),
-        .DWIDTH_OUT(PADDER_DWIDTH)
-    ) padder_0 (
+    sobel #(
+        .IMG_WIDTH(IMG_HEIGHT),
+        .IMG_HEIGHT(IMG_WIDTH)
+    ) sobel_0 (
         .clock(clock),
         .reset(reset),
         .fifo_in_rd_en(fifo_grayscale_rd_en),
         .fifo_in_dout(fifo_grayscale_dout),
         .fifo_in_empty(fifo_grayscale_empty),
-        .fifo_out_wr_en(fifo_padder_wr_en),
-        .fifo_out_din(fifo_padder_din),
-        .fifo_out_full(fifo_padder_full)
-    );
-
-    fifo #(
-        .FIFO_DATA_WIDTH(PADDER_DWIDTH),
-        .FIFO_BUFFER_SIZE(PADDER_BUFFER)
-    ) fifo_rgb (
-        .rd_clk(clock),
-        .wr_clk(clock),
-        .reset(reset),
-        .rd_en(fifo_padder_rd_en),
-        .wr_en(fifo_padder_wr_en),
-        .din(fifo_padder_din),
-        .dout(fifo_padder_dout),
-        .full(fifo_padder_full),
-        .empty(fifo_padder_empty)
-    );
-
-    sobel #(
-        .DWIDTH_IN(PADDER_DWIDTH),
-        .DWIDTH_OUT(SOBEL_DWIDTH)
-    ) sobel_0 (
-        .clock(clock),
-        .reset(reset),
-        .fifo_in_rd_en(fifo_padder_rd_en),
-        .fifo_in_dout(fifo_padder_dout),
-        .fifo_in_empty(fifo_padder_empty),
         .fifo_out_wr_en(fifo_sobel_wr_en),
         .fifo_out_din(fifo_sobel_din),
         .fifo_out_full(fifo_sobel_full)

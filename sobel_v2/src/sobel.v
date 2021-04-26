@@ -1,24 +1,25 @@
 `timescale 1 ns / 1 ns
 
 module sobel #(
-    parameter integer IMG_WIDTH = 720, //8 bits
-    parameter integer IMG_HEIGHT = 540 //8*9 bits
+    parameter integer IMG_WIDTH = 720,
+    parameter integer IMG_HEIGHT = 540
 )(
     input wire clock,
     input wire reset,
 
-    //fifo in
-    output reg in_rd_en,
-    input wire [7:0] in_dout, //{1443, 723, 3}, i.e. larget index will grab largest pixel number
-    input wire in_empty,
+    //in
+    output reg in_rd_en, 
+    input [DWIDTH_IN-1:0] in_dout, 
+    input in_empty,
 
-    //fifo out
-    output reg out_wr_en,
-    output reg [7:0] out_din,
-    input wire out_full
+    //out
+    output reg out_wr_en, 
+    output reg [DWIDTH_OUT-1:0] out_din, 
+    input out_full
 );
 
 //DWIDTH_IN = 8
+//DWIDTH_OUT = 8
     localparam integer REG_SIZE = IMG_WIDTH*2 + 3; //REG_SIZE should be 1443(720*2 + 3)
 
     reg [7:0] shift_reg [0:REG_SIZE - 1];
@@ -26,6 +27,7 @@ module sobel #(
     wire [7:0] grad;
     //coordinates in our image
     reg [12:0] x,x_c,y,y_c; //Not sure how big these need to be or even if they are the same size
+    //todo: include the log2 function here, use it to parameterize size of x, y
 
     reg [7:0] data [0:8];
     reg [15:0] count,count_c;
@@ -39,7 +41,10 @@ module sobel #(
     localparam s2 = 2'b10;
     localparam s3 = 2'b11;
 
-    sobel_op sobel_1( 
+    sobel_op #(
+        .DWIDTH_IN(8*9),
+        .DWIDTH_OUT(8)
+    ) sobel_0 (
         .clock(clock),
         .reset(reset),
         .in(data),
@@ -96,8 +101,8 @@ module sobel #(
                         next_state = s1;
                     end
                 end
-
             end
+
             s1: begin
                 if(in_empty == 1'b0) begin
                     in_rd_en = 1'b1;
@@ -116,6 +121,7 @@ module sobel #(
                     next_state = s2;
                 end
             end
+
             s2: begin
                 if(out_full == 1'b0) begin
                     //out_din = grad;
@@ -123,6 +129,7 @@ module sobel #(
                     next_state = s1;
                 end
             end
+            
             default: begin
                 x_c = 'b0;
                 y_c = 'b0;
