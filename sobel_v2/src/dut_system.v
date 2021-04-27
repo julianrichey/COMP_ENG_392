@@ -101,6 +101,8 @@ module dut_system #(
     );
 
     sobel #(
+        .WINDOW_SIZE(3),
+        .STRIDE(1),
         .DWIDTH_IN(GRAYSCALE_DWIDTH),
         .DWIDTH_OUT(SOBEL_DWIDTH)
         .IMG_WIDTH(IMG_HEIGHT),

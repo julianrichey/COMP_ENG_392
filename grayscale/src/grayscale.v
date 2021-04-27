@@ -20,9 +20,6 @@ module grayscale(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_
     output reg [(FIFO_DWIDTH_OUT - 1):0] fifo_out_din;
     input wire fifo_out_full;
 
-    reg [FIFO_DWIDTH_OUT-1:0] data, data_c;
-    reg is_data, is_data_c;
-
     function [7:0] rgb_avg;
         input [23:0] vals;
         reg [9:0] sum;
@@ -34,35 +31,17 @@ module grayscale(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_
             rgb_avg = sum / 3;
         end
     endfunction
-    
-    always @(posedge clock, posedge reset) begin
-        if (reset) begin
-            fifo_in_rd_en <= 1'b0;
-            fifo_out_wr_en <= 1'b0;
-            fifo_out_din <= 'b0;
-            is_data <= 1'b0;
-        end else begin
-            data <= data_c;
-            is_data <= is_data_c;
-        end
-    end
 
     always @* begin
-        data_c = data;
+        fifo_out_din = rgb_avg(fifo_in_dout);
         fifo_in_rd_en = 1'b0;
         fifo_out_wr_en = 1'b0;
-        fifo_out_din = data;
-        is_data_c = 1'b0;
-
-        if (fifo_in_empty == 1'b0) begin
-            is_data_c = 1'b1;
+        
+        if (fifo_in_empty == 1'b0 && fifo_out_full == 1'b0) begin
             fifo_in_rd_en = 1'b1;
-            data_c = (CONVERT_GRAYSCALE) ? rgb_avg(fifo_in_dout) : fifo_in_dout;
-        end
-
-        if (fifo_out_full == 1'b0 && is_data == 1'b1) begin
             fifo_out_wr_en = 1'b1;
         end
+
     end
 
 endmodule

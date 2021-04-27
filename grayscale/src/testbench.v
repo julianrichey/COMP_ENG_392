@@ -203,8 +203,6 @@ module dut_testbench();
         for (k=0; k<bmp_header_size; k=k+1) begin
             $fwrite(fifo_out_file, "%c", bmp_header[k]);
         end
-
-        wait( fifo_out_empty == 1'b0);
         
         for (k=0; k<bmp_data_size; k=k+increment) begin
             wait( clock == 1'b1 );
