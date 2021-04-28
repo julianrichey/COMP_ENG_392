@@ -165,7 +165,7 @@ module dut_testbench();
         wait( clock == 1'b0 );
         wait( clock == 1'b1 );
         
-        $write("@ %0t: Loading file %s...\n", $time, fifo_in_name_0);
+        $write("@ %0t: Loading file %s...\n", $time, fifo_in_name);
         fifo_in_file = $fopen(fifo_in_name, "rb");
 
         //Initial 54 byte read for header
@@ -184,9 +184,7 @@ module dut_testbench();
             end
         end
         
-        $fclose(fifo_in_file_0);
-        $fclose(fifo_in_file_1);
-        $fclose(fifo_in_file_2);
+        $fclose(fifo_in_file);
         
         wait( clock == 1'b0 );
         wait( clock == 1'b1 );

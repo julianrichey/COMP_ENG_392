@@ -104,18 +104,18 @@ module dut_system #(
         .WINDOW_SIZE(3),
         .STRIDE(1),
         .DWIDTH_IN(GRAYSCALE_DWIDTH),
-        .DWIDTH_OUT(SOBEL_DWIDTH)
-        .IMG_WIDTH(IMG_HEIGHT),
-        .IMG_HEIGHT(IMG_WIDTH)
+        .DWIDTH_OUT(SOBEL_DWIDTH),
+        .IMG_WIDTH(IMG_WIDTH),
+        .IMG_HEIGHT(IMG_HEIGHT)
     ) sobel_0 (
         .clock(clock),
         .reset(reset),
-        .in_rd_en(fifo_grayscale_rd_en),
-        .in_dout(fifo_grayscale_dout),
-        .in_empty(fifo_grayscale_empty),
-        .out_wr_en(fifo_sobel_wr_en),
-        .out_din(fifo_sobel_din),
-        .out_full(fifo_sobel_full)
+        .fifo_in_rd_en(fifo_grayscale_rd_en),
+        .fifo_in_dout(fifo_grayscale_dout),
+        .fifo_in_empty(fifo_grayscale_empty),
+        .fifo_out_wr_en(fifo_sobel_wr_en),
+        .fifo_out_din(fifo_sobel_din),
+        .fifo_out_full(fifo_sobel_full)
     );
 
     fifo #(
