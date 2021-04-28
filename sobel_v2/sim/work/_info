@@ -10,140 +10,146 @@ z2
 cModel Technology
 dC:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel/sim
 vdut_system
-Z0 !s110 1619587858
+!s110 1619647009
 !i10b 1
-!s100 iAb5o2e9^j55QFN1eefTg3
-Z1 !s11b Dg1SIo80bB@j0V0VzS_@n1
-I;HFPS@R8g0`[a<^Dn`@Pb0
-Z2 VDg1SIo80bB@j0V0VzS_@n1
-Z3 dC:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim
+!s100 [U0bZAhnid>mke]HjiLA`0
+Z0 !s11b Dg1SIo80bB@j0V0VzS_@n1
+IM;56QThEo<Jb1;o?Vd?`o2
+Z1 VDg1SIo80bB@j0V0VzS_@n1
+Z2 dC:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim
 w1619585446
 8../src/dut_system.v
 F../src/dut_system.v
-!i122 336
+!i122 397
 L0 13 124
-Z4 OV;L;2020.1;71
+Z3 OV;L;2020.1;71
 r1
 !s85 0
 31
-Z5 !s108 1619587858.000000
+Z4 !s108 1619647008.000000
 !s107 ../src/dut_system.v|
-!s90 -reportprogress|300|-work|work|../src/dut_system.v|
+!s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/dut_system.v|
+!s101 -O0
 !i113 1
-Z6 o-work work
-Z7 tCvgOpt 0
+Z5 o-O0 -work work
+Z6 tDisableOpt 1 Vlog01Compat 1 CvgOpt 0
 vdut_testbench
-R0
+!s110 1619644178
 !i10b 1
-!s100 8hI:@6SUS3Eik5LkNLKTz1
+!s100 ?>Kmd>1S]7aM9gjIIEOoY3
+R0
+IR6:RTJkCKK@HJ4UD:DWlT0
 R1
-IZMK?7ZfH:W@J0GK3Hn:Bi2
 R2
-R3
 w1619585348
 8../src/testbench.v
 F../src/testbench.v
-!i122 337
+!i122 392
 L0 3 284
-R4
+R3
 r1
 !s85 0
 31
-R5
+!s108 1619644178.000000
 !s107 ../src/testbench.v|
-!s90 -reportprogress|300|-work|work|../src/testbench.v|
+!s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-reportprogress|300|-work|work|../src/testbench.v|
+!s101 -O0
 !i113 1
+R5
 R6
-R7
 vfifo
-Z8 !s110 1619587857
+Z7 !s110 1619647007
 !i10b 1
-!s100 ?8UJVoj:[:^7JXKb^MaLP3
+!s100 l0[:CPXjAThH6G@P73XcF0
+R0
+I@]?:jh^Le=Cg9dnI2e9NM3
 R1
-IDjDHdk5QP]<ZQJzPe2_C@0
 R2
-R3
 w1619495075
 8../src/fifo.v
 F../src/fifo.v
-!i122 332
+!i122 393
 L0 18 47
-R4
+R3
 r1
 !s85 0
 31
-Z9 !s108 1619587857.000000
+Z8 !s108 1619647007.000000
 !s107 ../src/fifo.v|
-!s90 -reportprogress|300|-work|work|../src/fifo.v|
+!s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/fifo.v|
+!s101 -O0
 !i113 1
+R5
 R6
-R7
 vgrayscale
-R8
+R7
 !i10b 1
-!s100 SjjlJbb]dgmE5?lD^BVXf2
+!s100 ;C8dFeFO>c>CzXCAne@TT0
+R0
+IM7kjd>@AXSjD;AEJnjnNH3
 R1
-I`]Zf`jPh0nNj2cfL32``_2
 R2
-R3
 w1619578914
 8../src/grayscale.v
 F../src/grayscale.v
-!i122 333
+!i122 394
 L0 3 54
-R4
+R3
 r1
 !s85 0
 31
-R9
+R8
 !s107 ../src/grayscale.v|
-!s90 -reportprogress|300|-work|work|../src/grayscale.v|
+!s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/grayscale.v|
+!s101 -O0
 !i113 1
+R5
 R6
-R7
 vsobel
-R0
+Z9 !s110 1619647008
 !i10b 1
-!s100 Q6UQ;PCZl06LQAhTAchJR3
+!s100 MB>ihf3R>6P]eNMFZo3f01
+R0
+Ii<h0HO_XJj>1fChe5IbZ<1
 R1
-IeeadIn8Ib_D`_6ioA`]140
 R2
-R3
-w1619587830
+w1619644257
 8../src/sobel.v
 F../src/sobel.v
-!i122 335
-L0 60 240
-R4
+!i122 396
+L0 60 243
+R3
 r1
 !s85 0
 31
-R5
+R4
 !s107 ../src/sobel.v|
-!s90 -reportprogress|300|-work|work|../src/sobel.v|
+!s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/sobel.v|
+!s101 -O0
 !i113 1
+R5
 R6
-R7
 vsobel_op
-R0
+R9
 !i10b 1
-!s100 1zRekhdKF3lldl>j8R0cO2
+!s100 kF85J=Y9P83<0C8GYGD363
+R0
+IiZL?OEk=[]nLeUaJ4z4?Q2
 R1
-Ikke^JSj[[5ODLh`5^PQ@z1
 R2
-R3
 w1619585838
 8../src/sobel_op.v
 F../src/sobel_op.v
-!i122 334
+!i122 395
 L0 5 57
-R4
+R3
 r1
 !s85 0
 31
-R9
+R4
 !s107 ../src/sobel_op.v|
-!s90 -reportprogress|300|-work|work|../src/sobel_op.v|
+!s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/sobel_op.v|
+!s101 -O0
 !i113 1
+R5
 R6
-R7

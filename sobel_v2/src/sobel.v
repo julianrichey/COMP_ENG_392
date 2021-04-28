@@ -109,15 +109,13 @@ module sobel #(
 
 
 
-
+    
     reg [(DWIDTH_IN*WINDOW_SIZE*WINDOW_SIZE)-1:0] window;
-    integer ii,jj,kk;
+    integer ii,jj;
     always @* begin
         for (ii=0; ii<WINDOW_SIZE; ii=ii+1) begin
             for (jj=0; jj<WINDOW_SIZE; jj=jj+1) begin
-                for (kk=0; kk<8; kk=kk+1) begin
-                    window[(ii*WINDOW_SIZE + jj)*8 + kk] = shift_reg[(ii*IMG_WIDTH + jj)*8 + kk]; //shift_reg_c vs shift_reg??
-                end
+                window[(ii*WINDOW_SIZE + jj)*8 +: 8] = shift_reg[ii*IMG_WIDTH + jj];
             end
         end
     end
@@ -149,7 +147,7 @@ module sobel #(
             x <= 'b0;
             y <= 'b0;
             for (iii=0; iii<REG_SIZE; iii=iii+1) begin
-                shift_reg[iii] <= 8'h55; //TEMP - should be 'b0 
+                shift_reg[iii] <= 'b0; //TEMP - should be 'b0 
             end
 
             fifo_out_din <= 'b0;
@@ -175,120 +173,125 @@ module sobel #(
         x_c = x;
         y_c = y;
         for (i=0; i<REG_SIZE; i=i+1) begin
-            shift_reg_c[i] <= shift_reg[i];
+            shift_reg_c[i] = 8'h00;
         end
+
+        // for (i=1; i<REG_SIZE; i=i+1) begin
+        //     shift_reg_c[i] = shift_reg[i-1];
+        // end
+        // shift_reg_c[0] = 8'h55;
 
         fifo_in_rd_en = 1'b0;
         fifo_out_wr_en_c = 1'b0;
 
-        // case (state)
-        //     PROLOGUE: begin
-        //         if (fifo_in_empty == 1'b0) begin
-        //             fifo_in_rd_en = 1'b1;
+        case (state)
+            PROLOGUE: begin
+                if (fifo_in_empty == 1'b0) begin
+                    fifo_in_rd_en = 1'b1;
 
-        //             if (x == 0 && y == 0) begin //clear out shift_reg for new frame
-        //                 for (i=1; i<REG_SIZE; i=i+1) begin
-        //                     shift_reg_c[i] = 'b1; //TEMP - should be 'b0
-        //                 end
-        //                 shift_reg_c[0] = fifo_in_dout;
-        //                 x_c = x + 'b1;
-        //                 y_c = y;
-        //             end else if (x == IMG_WIDTH-1) begin
-        //                 for (i=1+(PADDING*2); i<REG_SIZE; i=i+1) begin
-        //                     shift_reg_c[i] = shift_reg[i-1-(PADDING*2)]; //can skip forward like this because this isnt outputting yet- can skip over PADDING*2 instead of just PADDING elements
-        //                 end
-        //                 shift_reg_c[PADDING*2] = fifo_in_dout;
-        //                 for (i=0; i<PADDING*2; i=i+1) begin
-        //                     shift_reg_c[i] = 'b0;
-        //                 end
-        //                 x_c = 'b0;
-        //                 y_c = y + 'b1;
-        //             end else begin
-        //                 for (i=1; i<REG_SIZE; i=i+1) begin
-        //                     shift_reg_c[i] = shift_reg[i-1];
-        //                 end
-        //                 shift_reg_c[0] = fifo_in_dout;
-        //                 x_c = x + 'b1;
-        //                 y_c = y;
-        //             end
+                    if (x == 0 && y == 0) begin //clear out shift_reg for new frame
+                        for (i=1; i<REG_SIZE; i=i+1) begin
+                            shift_reg_c[i] = 'b1; //TEMP - should be 'b0
+                        end
+                        shift_reg_c[0] = fifo_in_dout;
+                        x_c = x + 'b1;
+                        y_c = y;
+                    end else if (x == IMG_WIDTH-1) begin
+                        for (i=1+(PADDING*2); i<REG_SIZE; i=i+1) begin
+                            shift_reg_c[i] = shift_reg[i-1-(PADDING*2)]; //can skip forward like this because this isnt outputting yet- can skip over PADDING*2 instead of just PADDING elements
+                        end
+                        shift_reg_c[PADDING*2] = fifo_in_dout;
+                        for (i=0; i<PADDING*2; i=i+1) begin
+                            shift_reg_c[i] = 'b0;
+                        end
+                        x_c = 'b0;
+                        y_c = y + 'b1;
+                    end else begin
+                        for (i=1; i<REG_SIZE; i=i+1) begin
+                            shift_reg_c[i] = shift_reg[i-1];
+                        end
+                        shift_reg_c[0] = fifo_in_dout;
+                        x_c = x + 'b1;
+                        y_c = y;
+                    end
 
-        //             if (x == PADDING-1 && y == PADDING) begin //-1 so that x=PADDING,y=PADDING on middlogue start
-        //                 state_c = MIDDLOGUE;
-        //             end
-        //         end
-        //     end
+                    if (x == PADDING-1 && y == PADDING) begin //-1 so that x=PADDING,y=PADDING on middlogue start
+                        state_c = MIDDLOGUE;
+                    end
+                end
+            end
 
-        //     //this entire thing needs to be rewritten to consider different padding. right now, assume window is 3x3
-        //     MIDDLOGUE: begin
-        //         if (x == IMG_WIDTH && fifo_out_full == 1'b0) begin //right edge. x >= img_width?
-        //             fifo_out_wr_en_c = 1'b1;
+            //this entire thing needs to be rewritten to consider different padding. right now, assume window is 3x3
+            MIDDLOGUE: begin
+                if (x == IMG_WIDTH && fifo_out_full == 1'b0) begin //right edge. x >= img_width?
+                    fifo_out_wr_en_c = 1'b1;
 
-        //             for (i=1; i<REG_SIZE; i=i+1) begin
-        //                 shift_reg_c[i] = shift_reg[i-1];
-        //             end
-        //             shift_reg_c[0] = 'b0;
+                    for (i=1; i<REG_SIZE; i=i+1) begin
+                        shift_reg_c[i] = shift_reg[i-1];
+                    end
+                    shift_reg_c[0] = 'b0;
 
-        //             x_c = 'b0;
-        //             y_c = y + 'b1;
+                    x_c = 'b0;
+                    y_c = y + 'b1;
                     
-        //         end else if (x == 0 && fifo_in_empty == 1'b0) begin //left edge. x < PADDING?
-        //             fifo_in_rd_en = 1'b1;
+                end else if (x == 0 && fifo_in_empty == 1'b0) begin //left edge. x < PADDING?
+                    fifo_in_rd_en = 1'b1;
 
-        //             for (i=2; i<REG_SIZE; i=i+1) begin
-        //                 shift_reg_c[i] = shift_reg[i-2];
-        //             end
-        //             shift_reg_c[1] = 'b0;
-        //             shift_reg_c[0] = fifo_in_dout;
+                    for (i=2; i<REG_SIZE; i=i+1) begin
+                        shift_reg_c[i] = shift_reg[i-2];
+                    end
+                    shift_reg_c[1] = 'b0;
+                    shift_reg_c[0] = fifo_in_dout;
 
-        //             x_c = x + 'b1;
-        //             y_c = y;
+                    x_c = x + 'b1;
+                    y_c = y;
 
-        //         end else if (fifo_in_empty == 1'b0 && fifo_out_full == 1'b0) begin
-        //             fifo_in_rd_en = 1'b1;
-        //             fifo_out_wr_en_c = 1'b1;
+                end else if (fifo_in_empty == 1'b0 && fifo_out_full == 1'b0) begin
+                    fifo_in_rd_en = 1'b1;
+                    fifo_out_wr_en_c = 1'b1;
 
-        //             for (i=1; i<REG_SIZE; i=i+1) begin
-        //                 shift_reg_c[i] = shift_reg[i-1];
-        //             end
-        //             shift_reg_c[0] = fifo_in_dout;
+                    for (i=1; i<REG_SIZE; i=i+1) begin
+                        shift_reg_c[i] = shift_reg[i-1];
+                    end
+                    shift_reg_c[0] = fifo_in_dout;
 
-        //             x_c = x + 'b1;
-        //             y_c = y;
+                    x_c = x + 'b1;
+                    y_c = y;
 
-        //             if (x == IMG_WIDTH-1 && y == IMG_HEIGHT-1) begin
-        //                 state_c = EPILOGUE;
-        //             end
-        //         end
-        //     end
+                    if (x == IMG_WIDTH-1 && y == IMG_HEIGHT-1) begin
+                        state_c = EPILOGUE;
+                    end
+                end
+            end
 
-        //     EPILOGUE: begin
-        //         if (fifo_out_full == 1'b0) begin
-        //             fifo_out_wr_en_c = 1'b1;
+            EPILOGUE: begin
+                if (fifo_out_full == 1'b0) begin
+                    fifo_out_wr_en_c = 1'b1;
 
-        //             if (x == IMG_WIDTH+PADDING-1 && y == IMG_HEIGHT+PADDING-1) begin
-        //                 state_c = PROLOGUE;
-        //                 x_c = 'b0;
-        //                 y_c = 'b0;
-        //             end else if (x == IMG_WIDTH+PADDING-1) begin
-        //                 for (i=1+(PADDING*2); i<REG_SIZE; i=i+1) begin
-        //                     shift_reg_c[i] = shift_reg[i-1-(PADDING*2)];
-        //                 end
-        //                 for (i=0; i<1+PADDING*2; i=i+1) begin
-        //                     shift_reg_c[i] = 'b0;
-        //                 end
-        //                 x_c = PADDING;
-        //                 y_c = y + 'b1;
-        //             end else begin
-        //                 for (i=1; i<REG_SIZE; i=i+1) begin
-        //                     shift_reg_c[i] = shift_reg[i-1];
-        //                 end
-        //                 shift_reg_c[i] = 'b0;
-        //                 x_c = x + 'b1;
-        //                 y_c = y;
-        //             end
-        //         end
-        //     end
-        // endcase
+                    if (x == IMG_WIDTH+PADDING-1 && y == IMG_HEIGHT+PADDING-1) begin
+                        state_c = PROLOGUE;
+                        x_c = 'b0;
+                        y_c = 'b0;
+                    end else if (x == IMG_WIDTH+PADDING-1) begin
+                        for (i=1+(PADDING*2); i<REG_SIZE; i=i+1) begin
+                            shift_reg_c[i] = shift_reg[i-1-(PADDING*2)];
+                        end
+                        for (i=0; i<1+PADDING*2; i=i+1) begin
+                            shift_reg_c[i] = 'b0;
+                        end
+                        x_c = PADDING;
+                        y_c = y + 'b1;
+                    end else begin
+                        for (i=1; i<REG_SIZE; i=i+1) begin
+                            shift_reg_c[i] = shift_reg[i-1];
+                        end
+                        shift_reg_c[i] = 'b0;
+                        x_c = x + 'b1;
+                        y_c = y;
+                    end
+                end
+            end
+        endcase
 
         // for (ii=0; ii<WINDOW_SIZE; ii=ii+1) begin
         //     for (jj=0; jj<WINDOW_SIZE; jj=jj+1) begin

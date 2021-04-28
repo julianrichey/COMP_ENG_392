@@ -17,6 +17,9 @@ add wave -noupdate -group dut_testbench/dut_system_inst/fifo_grayscale -radix he
 add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0
 add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0 -radix hexadecimal /dut_testbench/dut_system_inst/sobel_0/*
 
+add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0 -radix hexadecimal /dut_testbench/dut_system_inst/sobel_0/shift_reg
+
+
 add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0/sobel_op_0
 add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0/sobel_op_0 -radix hexadecimal /dut_testbench/dut_system_inst/sobel_0/sobel_op_0/*
 

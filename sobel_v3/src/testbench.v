@@ -4,12 +4,9 @@
 
 module dut_testbench();
 
-    localparam integer CONVERT_GRAYSCALE = 1;
-        //CONVERT_GRAYSCALE=0: 24->24 rgb
-        //CONVERT_GRAYSCALE=1: 24->8 grayscale
-    localparam integer BUFFER_SIZE = 2; //2 is minimum
-    localparam integer DWIDTH_IN = 8*3;
-    localparam integer DWIDTH_OUT = (CONVERT_GRAYSCALE) ? 8*1 : 8*3;
+    // localparam integer BUFFER_SIZE = 2; //2 is minimum
+    // localparam integer DWIDTH_IN = 8*3;
+    // localparam integer DWIDTH_OUT = ;
     
     parameter [18*8-1:0] fifo_in_name = "copper_720_540.bmp";
     parameter [20*8-1:0] fifo_out_name = "copper_grayscale.bmp";
@@ -80,12 +77,9 @@ module dut_testbench();
         end
     endfunction
 
-    dut_system #(
-        .CONVERT_GRAYSCALE(CONVERT_GRAYSCALE),
-        .FIFO_DWIDTH_IN(DWIDTH_IN),
-        .FIFO_DWIDTH_OUT(DWIDTH_OUT),
-        .FIFO_BUFFER_SIZE(BUFFER_SIZE)
-    ) dut_system_inst (
+
+
+    dut_system dut_system_inst (
         .clock(clock),
         .reset(reset),
         .fifo_in_din(fifo_in_din),

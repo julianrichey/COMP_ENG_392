@@ -28,6 +28,15 @@ module sobel #(
     reg [12:0] x,x_c,y,y_c; //Not sure how big these need to be or even if they are the same size
 
     reg [7:0] data [0:8];
+    reg [8*9-1:0] flat_data;
+
+    integer ii;
+    always @* begin
+        for (ii=0; ii<9; ii=ii+1) begin
+            flat_data[ii*8 +: 8] = data[ii];
+        end
+    end
+
     reg [15:0] count,count_c;
 
     integer i,j;
@@ -42,7 +51,7 @@ module sobel #(
     sobel_op sobel_1( 
         .clock(clock),
         .reset(reset),
-        .in(data),
+        .in(flat_data),
         .out(grad)
     );
 
@@ -60,7 +69,9 @@ module sobel #(
             count <= count_c;
             x <= x_c;
             y <= y_c;
-            shift_reg <= shift_reg_c;
+            for(i=0;i<REG_SIZE;i=i+1) begin
+                shift_reg[i] <= shift_reg_c[i]; 
+            end
             state <= next_state;
         end
     end
@@ -69,7 +80,9 @@ module sobel #(
         next_state = state;
         x_c = x;
         y_c = y;
-        shift_reg_c = shift_reg;
+        for(i=0;i<REG_SIZE;i=i+1) begin
+            shift_reg_c[i] <= shift_reg[i]; 
+        end
         in_rd_en = 1'b0;
         out_wr_en = 1'b0;
         out_din = grad;
@@ -96,8 +109,8 @@ module sobel #(
                         next_state = s1;
                     end
                 end
-
             end
+            
             s1: begin
                 if(in_empty == 1'b0) begin
                     in_rd_en = 1'b1;
@@ -105,24 +118,49 @@ module sobel #(
                         shift_reg_c[i] = shift_reg[i-1]; 
                     end
                     shift_reg_c[0] = in_dout;
-                    x_c = x + 12'b1;
+                    
                     if(y == IMG_HEIGHT - 1 && x == IMG_WIDTH - 1) begin
-                        y_c = 'b0;
                         x_c = 'b0;
+                        y_c = y + 12'b1;
                     end else if(x == IMG_WIDTH - 1) begin
                         x_c = 'b0;
-                        y_c = y +12'b1;
+                        y_c = y + 12'b1;
+                    end else begin
+                        x_c = x + 12'b1;
+                        y_c = y;
                     end
-                    next_state = s2;
+
+                    if (x > 0 && x < IMG_WIDTH) begin
+                        next_state = s2;
+                    end
                 end
             end
+
             s2: begin
                 if(out_full == 1'b0) begin
                     //out_din = grad;
                     out_wr_en = 1'b1;
                     next_state = s1;
+                    if (y == IMG_HEIGHT && x == 0) begin
+                        next_state = s3;
+                    end
                 end
             end
+
+            s3: begin
+                if (out_full == 1'b0) begin
+                    in_rd_en = 1'b1;
+                    for (i=REG_SIZE-1; i>0; i=i-1) begin
+                        shift_reg_c[i] = shift_reg[i-1]; 
+                    end
+                    shift_reg_c[0] = in_dout;
+                    count_c = count + 16'b1;
+                    if(count == REG_SIZE - 1) begin
+                        next_state = s0;
+                    end
+                end
+            end
+
             default: begin
                 x_c = 'b0;
                 y_c = 'b0;

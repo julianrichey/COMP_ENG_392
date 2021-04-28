@@ -5,6 +5,9 @@ vmap work work
 
 vlog -work work "../src/fifo.v"
 vlog -work work "../src/grayscale.v"
+vlog -work work "../src/padding.v"
+vlog -work work "../src/sobel_op.v"
+vlog -work work "../src/sobel.v"
 vlog -work work "../src/dut_system.v"
 vlog -work work "../src/testbench.v"
 

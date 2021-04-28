@@ -10,9 +10,8 @@ module sobel_op #(
     input wire [DWIDTH_IN-1:0] in,
     output reg [DWIDTH_OUT-1:0] out
 );
-
-    localparam signed [7:0] horiz_op [0:8] = {8'shFF, 8'sh00, 8'sh01, 8'shFE, 8'sh00, 8'sh02, 8'shFF, 8'sh00, 8'sh01};
-    localparam signed [7:0] vert_op [0:8] = {8'shFF, 8'shFE, 8'shFF, 8'sh00, 8'sh00, 8'sh00, 8'sh01, 8'sh02, 8'sh01};
+    localparam signed [7:0] horiz_op [0:8] = '{8'shFF, 8'sh00, 8'sh01, 8'shFE, 8'sh00, 8'sh02, 8'shFF, 8'sh00, 8'sh01};
+    localparam signed [7:0] vert_op [0:8] = '{8'shFF, 8'shFE, 8'shFF, 8'sh00, 8'sh00, 8'sh00, 8'sh01, 8'sh02, 8'sh01};
 
     reg signed [15:0] hor_grad, vert_grad, v;
     reg [DWIDTH_OUT-1:0] out_c;

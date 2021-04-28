@@ -8,8 +8,19 @@ add wave -noupdate -group dut_testbench/dut_system_inst -radix hexadecimal /dut_
 add wave -noupdate -group dut_testbench/dut_system_inst/grayscale_0
 add wave -noupdate -group dut_testbench/dut_system_inst/grayscale_0 -radix hexadecimal /dut_testbench/dut_system_inst/grayscale_0/*
 
-add wave -noupdate -group dut_testbench/dut_system_inst/fifo_0
-add wave -noupdate -group dut_testbench/dut_system_inst/fifo_0 -radix hexadecimal /dut_testbench/dut_system_inst/fifo_0/*
+add wave -noupdate -group dut_testbench/dut_system_inst/grayscale_0
+add wave -noupdate -group dut_testbench/dut_system_inst/grayscale_0 -radix hexadecimal /dut_testbench/dut_system_inst/grayscale_0/*
 
-add wave -noupdate -group dut_testbench/dut_system_inst/fifo_1
-add wave -noupdate -group dut_testbench/dut_system_inst/fifo_1 -radix hexadecimal /dut_testbench/dut_system_inst/fifo_1/*
+add wave -noupdate -group dut_testbench/dut_system_inst/grayscale_0
+add wave -noupdate -group dut_testbench/dut_system_inst/grayscale_0 -radix hexadecimal /dut_testbench/dut_system_inst/grayscale_0/*
+
+
+
+
+
+
+add wave -noupdate -group dut_testbench/dut_system_inst/fifo_rgb
+add wave -noupdate -group dut_testbench/dut_system_inst/fifo_rgb -radix hexadecimal /dut_testbench/dut_system_inst/fifo_rgb/*
+
+add wave -noupdate -group dut_testbench/dut_system_inst/fifos[3]
+add wave -noupdate -group dut_testbench/dut_system_inst/fifos[3] -radix hexadecimal /dut_testbench/dut_system_inst/fifos[3]/*

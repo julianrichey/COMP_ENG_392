@@ -3,7 +3,6 @@
 
 module grayscale(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_out_wr_en, fifo_out_din, fifo_out_full);
 
-    parameter integer CONVERT_GRAYSCALE;
     parameter integer FIFO_DWIDTH_IN;
     parameter integer FIFO_DWIDTH_OUT;
 
@@ -57,7 +56,7 @@ module grayscale(clock, reset, fifo_in_rd_en, fifo_in_dout, fifo_in_empty, fifo_
         if (fifo_in_empty == 1'b0) begin
             is_data_c = 1'b1;
             fifo_in_rd_en = 1'b1;
-            data_c = (CONVERT_GRAYSCALE) ? rgb_avg(fifo_in_dout) : fifo_in_dout;
+            data_c = rgb_avg(fifo_in_dout);
         end
 
         if (fifo_out_full == 1'b0 && is_data == 1'b1) begin
