@@ -22,8 +22,6 @@ module padding #(
 
     //coordinates in our image 
 
-    reg [15:0] count,count_c;
-
 
     reg [12:0] x,x_c,y,y_c;
 
@@ -36,7 +34,6 @@ module padding #(
 
     always @(posedge clock, posedge reset) begin
         if (reset == 1'b1) begin
-            count <= 'b0;
             x <= 'b0;
             y <= 'b0;
             state <= s0;
@@ -44,7 +41,6 @@ module padding #(
         end else if (clock == 1'b1) begin
             x <= x_c;
             y <= y_c;
-            count <= count_c;
             state <= next_state;
         end
     end
@@ -53,14 +49,14 @@ module padding #(
 //how do we know what to do when we get to a new image???
     //always @(state,in_empty,in_dout,out_full,x,y,shift_reg,count) begin
     always @(*) begin
-        next_state = state;
+        next_state <= state;
         //what do I put for in_rd_en for each of these states?
-        in_rd_en = 1'b0;
-        out_wr_en = 1'b0;
-        out_din = in_dout;
+        in_rd_en <= 1'b0;
+        out_wr_en <= 1'b0;
+        out_din <= in_dout;
         //count_c <= count;
-        x_c = x;
-        y_c = y;
+        x_c <= x;
+        y_c <= y;
 
 
         case(state) 
@@ -69,14 +65,14 @@ module padding #(
             //first row
             if(y == 'b0 && out_full == 1'b0) begin
                 //output 0 to the out_din
-                x_c = x+1;
-                out_din = 0;
-                out_wr_en = 1'b1;
+                x_c <= x+1;
+                out_din <= 0;
+                out_wr_en <= 1'b1;
                 if (x == IMG_WIDTH + 1) begin
-                    x_c = 0;
-                    y_c = y+1;
+                    x_c <= 0;
+                    y_c <= y+1;
                     //now we are ready to output a line of our data
-                    next_state = s1;
+                    next_state <= s1;
                 end
             end
             
@@ -85,39 +81,40 @@ module padding #(
         end
         s1: begin
             if(x == 0 && out_full == 0) begin
-                x_c = x+1;
-                out_din = 0;
-                out_wr_en = 1'b1;
+                x_c <= x+1;
+                out_din <= 0;
+                out_wr_en <= 1'b1;
             end
             else if(x == IMG_WIDTH + 1 && out_full == 0) begin
-                x_c = 0;
-                y_c = y+1;
-                out_din = 0;
-                out_wr_en = 1'b1;
+                x_c <= 0;
+                y_c <= y+1;
+                out_din <= 0;
+                out_wr_en <= 1'b1;
                 if(y == IMG_HEIGHT) begin
-                    next_state = s2;
+                    next_state <= s2;
                 end
             end
             else if(out_full == 0 && in_empty == 0) begin
                 //read from fifo 
                 //only case where we read from input fifo
-                in_rd_en = 1'b1;
-                out_din = in_dout;
-                //set rd_en and wr_en
+                x_c <= x+1;
+                in_rd_en <= 1'b1;
+                out_wr_en <= 1'b1;
+                out_din <= in_dout;
             end
         end
         //epilogue happens when we finish one frame(we know y==height + 1)
         s2: begin
             if(out_full == 0) begin
                 //output 0 to the out_din
-                x_c = x+1;
-                out_din = 0;
-                out_wr_en = 1'b1;
+                x_c <= x+1;
+                out_din <= 0;
+                out_wr_en <= 1'b1;
                 if (x == IMG_WIDTH + 1) begin
-                    x_c = 0;
-                    y_c = 0;
+                    x_c <= 0;
+                    y_c <= 0;
                     //prepare for the next frame
-                    state = s0;
+                    state <= s0;
                 end
             end
 

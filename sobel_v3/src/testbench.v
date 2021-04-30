@@ -5,8 +5,8 @@
 module dut_testbench();
 
     // localparam integer BUFFER_SIZE = 2; //2 is minimum
-    // localparam integer DWIDTH_IN = 8*3;
-    // localparam integer DWIDTH_OUT = ;
+     localparam integer DWIDTH_IN = 8*3;
+     localparam integer DWIDTH_OUT = 8;
     
     parameter [18*8-1:0] fifo_in_name = "copper_720_540.bmp";
     parameter [20*8-1:0] fifo_out_name = "copper_grayscale.bmp";
@@ -209,14 +209,15 @@ module dut_testbench();
             end else begin
                 fifo_out_rd_en <= 1'b1;
                 fifo_out_data_read = fifo_out_dout;
+                /*
                 if (CONVERT_GRAYSCALE) begin
                     $fwrite(fifo_out_file, "%c%c%c", fifo_out_data_read, fifo_out_data_read, fifo_out_data_read);
                 end else begin
+                    */
                     //modelsim gives warnings, but don't worry, this would never get synthesized if CONVERT_GRAYSCALE=0
                     $fwrite(fifo_out_file, "%c", fifo_out_data_read[23:16]);
                     $fwrite(fifo_out_file, "%c", fifo_out_data_read[15:8]);
                     $fwrite(fifo_out_file, "%c", fifo_out_data_read[7:0]);
-                end
             end
         end
         
@@ -272,6 +273,7 @@ module dut_testbench();
         fifo_out_read_done <= 1'b1;
         
         wait( hold_clock == 1'b1 );
+        //wait; //ADDED HERE
     end
 
 endmodule

@@ -81,7 +81,7 @@ module sobel #(
         x_c = x;
         y_c = y;
         for(i=0;i<REG_SIZE;i=i+1) begin
-            shift_reg_c[i] <= shift_reg[i]; 
+            shift_reg_c[i] = shift_reg[i]; 
         end
         in_rd_en = 1'b0;
         out_wr_en = 1'b0;
