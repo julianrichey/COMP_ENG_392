@@ -18,6 +18,9 @@ add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0
 add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0 -radix hexadecimal /dut_testbench/dut_system_inst/sobel_0/*
 
 add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0 -radix hexadecimal /dut_testbench/dut_system_inst/sobel_0/shift_reg
+add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0 -radix hexadecimal /dut_testbench/dut_system_inst/sobel_0/shift_reg_c
+add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0 -radix hexadecimal /dut_testbench/dut_system_inst/sobel_0/edge_storage
+add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0 -radix hexadecimal /dut_testbench/dut_system_inst/sobel_0/edge_storage_c
 
 
 add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0/sobel_op_0

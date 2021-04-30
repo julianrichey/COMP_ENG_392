@@ -4,29 +4,34 @@ module dut_testbench();
 
     //from memory to grayscale
     localparam integer RGB_DWIDTH = 8 * 3;
-    localparam integer RGB_BUFFER = 2;
+    localparam integer RGB_BUFFER = 512;
 
     //from grayscale to sobel
     localparam integer GRAYSCALE_DWIDTH = 8;
-    localparam integer GRAYSCALE_BUFFER = 2;
+    localparam integer GRAYSCALE_BUFFER = 512;
 
     //from sobel to memory
     localparam integer SOBEL_DWIDTH = 8;
-    localparam integer SOBEL_BUFFER = 2;
+    localparam integer SOBEL_BUFFER = 512;
     
-    parameter [18*8-1:0] fifo_in_name = "copper_720_540.bmp";
-    parameter [16*8-1:0] fifo_out_name = "copper_sobel.bmp";
+    parameter [30*8-1:0] fifo_in_name = "tiny_64_32.bmp";
+    parameter [30*8-1:0] fifo_out_name = "tiny_sobel.bmp";
+    localparam integer bmp_width = 64;
+    localparam integer bmp_height = 32;
 
+    // parameter [30*8-1:0] fifo_in_name = "copper_720_540.bmp";
+    // parameter [30*8-1:0] fifo_out_name = "copper_sobel.bmp";
+    // localparam integer bmp_width = 720;
+    // localparam integer bmp_height = 540;
     // parameter [27*8-1:0] fifo_in_name = "brooklyn_bridge_720_540.bmp";
     // parameter [25*8-1:0] fifo_out_name = "brooklyn_bridge_sobel.bmp";
 
     //parameter [119:0] tb_fifo_out_name = "tb_fifo_out.txt";
 
-    localparam integer bmp_width = 720;
-    localparam integer bmp_height = 540;
+
     localparam integer bmp_header_size = 54;
     localparam integer bytes_per_pixel = 3;
-    localparam integer bmp_data_size = bmp_width*bmp_height*bytes_per_pixel;
+    localparam integer bmp_data_size = bmp_width*bmp_height*bytes_per_pixel+87; //between 87 and 88...
 
     parameter [63:0] clock_period = 100;
 
