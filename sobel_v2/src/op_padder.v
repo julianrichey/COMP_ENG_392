@@ -49,7 +49,7 @@ window is smaller than image
     (x <= 4096) ? 12 : \
     -1
 
-module padder #(
+module op_padder #(
     parameter integer OP,
 
     parameter integer WINDOW_SIZE,
@@ -76,8 +76,8 @@ module padder #(
     reg fifo_out_wr_en_shift_reg_c;
     reg [1:0] fifo_out_wr_en_shift_reg;
 
-    localparam OP_SOBEL = 4'h0;
-    localparam OP_GAUSSIAN = 4'h1;
+    localparam integer SOBEL_OP = 0;
+    localparam integer GAUSSIAN_OP = 1;
 
     reg [1:0] state,state_c;
     localparam PROLOGUE = 2'b00; //input, no output
@@ -107,11 +107,11 @@ module padder #(
 
     generate
         case (OP)
-            OP_SOBEL: begin
-                sobel_op #(
+            SOBEL_OP: begin
+                op_sobel #(
                     .DWIDTH_IN(DWIDTH_IN*WINDOW_SIZE*WINDOW_SIZE),
                     .DWIDTH_OUT(DWIDTH_OUT)
-                ) sobel_op_0 (
+                ) op_sobel_0 (
                     .clock(clock),
                     .reset(reset),
                     .in(window),
@@ -119,11 +119,18 @@ module padder #(
                 );
             end
 
-            OP_GAUSSIAN: begin
-                
+            GAUSSIAN_OP: begin
+                op_gaussian #(
+                    .DWIDTH_IN(DWIDTH_IN*WINDOW_SIZE*WINDOW_SIZE),
+                    .DWIDTH_OUT(DWIDTH_OUT)
+                ) op_gaussian_0 (
+                    .clock(clock),
+                    .reset(reset),
+                    .in(window),
+                    .out(fifo_out_din_c)
+                );
             end
         endcase
-
     endgenerate
 
 

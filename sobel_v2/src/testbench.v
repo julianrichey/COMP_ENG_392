@@ -4,15 +4,19 @@ module dut_testbench();
 
     //from memory to grayscale
     localparam integer RGB_DWIDTH = 8 * 3;
-    localparam integer RGB_BUFFER = 512;
+    localparam integer RGB_BUFFER = 16;
 
-    //from grayscale to sobel
+    //from grayscale to gaussian
     localparam integer GRAYSCALE_DWIDTH = 8;
-    localparam integer GRAYSCALE_BUFFER = 512;
+    localparam integer GRAYSCALE_BUFFER = 16;
+
+    //from gaussian to sobel
+    localparam integer GAUSSIAN_DWIDTH = 8;
+    localparam integer GAUSSIAN_BUFFER = 16;
 
     //from sobel to memory
     localparam integer SOBEL_DWIDTH = 8;
-    localparam integer SOBEL_BUFFER = 512;
+    localparam integer SOBEL_BUFFER = 16;
     
     parameter [30*8-1:0] fifo_in_name = "tiny_64_32.bmp";
     parameter [30*8-1:0] fifo_out_name = "tiny_sobel.bmp";
@@ -100,6 +104,8 @@ module dut_testbench();
         .RGB_BUFFER(RGB_BUFFER),
         .GRAYSCALE_DWIDTH(GRAYSCALE_DWIDTH),
         .GRAYSCALE_BUFFER(GRAYSCALE_BUFFER),
+        .GAUSSIAN_DWIDTH(GAUSSIAN_DWIDTH),
+        .GAUSSIAN_BUFFER(GAUSSIAN_BUFFER),
         .SOBEL_DWIDTH(SOBEL_DWIDTH),
         .SOBEL_BUFFER(SOBEL_BUFFER)
     ) dut_system_inst (

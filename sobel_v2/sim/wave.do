@@ -14,6 +14,15 @@ add wave -noupdate -group dut_testbench/dut_system_inst/grayscale_0 -radix hexad
 add wave -noupdate -group dut_testbench/dut_system_inst/fifo_grayscale
 add wave -noupdate -group dut_testbench/dut_system_inst/fifo_grayscale -radix hexadecimal /dut_testbench/dut_system_inst/fifo_grayscale/*
 
+add wave -noupdate -group dut_testbench/dut_system_inst/gaussian_0
+add wave -noupdate -group dut_testbench/dut_system_inst/gaussian_0 -radix hexadecimal /dut_testbench/dut_system_inst/gaussian_0/*
+
+add wave -noupdate -group dut_testbench/dut_system_inst/gaussian_0/op_gaussian_0
+add wave -noupdate -group dut_testbench/dut_system_inst/gaussian_0/op_gaussian_0 -radix hexadecimal /dut_testbench/dut_system_inst/gaussian_0/op_gaussian_0/*
+
+add wave -noupdate -group dut_testbench/dut_system_inst/fifo_gaussian
+add wave -noupdate -group dut_testbench/dut_system_inst/fifo_gaussian -radix hexadecimal /dut_testbench/dut_system_inst/fifo_gaussian/*
+
 add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0
 add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0 -radix hexadecimal /dut_testbench/dut_system_inst/sobel_0/*
 
@@ -22,9 +31,8 @@ add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0 -radix hexadecim
 add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0 -radix hexadecimal /dut_testbench/dut_system_inst/sobel_0/edge_storage
 add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0 -radix hexadecimal /dut_testbench/dut_system_inst/sobel_0/edge_storage_c
 
-
-add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0/sobel_op_0
-add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0/sobel_op_0 -radix hexadecimal /dut_testbench/dut_system_inst/sobel_0/sobel_op_0/*
+add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0/op_sobel_0
+add wave -noupdate -group dut_testbench/dut_system_inst/sobel_0/op_sobel_0 -radix hexadecimal /dut_testbench/dut_system_inst/sobel_0/op_sobel_0/*
 
 add wave -noupdate -group dut_testbench/dut_system_inst/fifo_sobel
 add wave -noupdate -group dut_testbench/dut_system_inst/fifo_sobel -radix hexadecimal /dut_testbench/dut_system_inst/fifo_sobel/*

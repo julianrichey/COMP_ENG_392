@@ -5,87 +5,65 @@
 # vmap work work 
 # Modifying modelsim.ini
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 14:52:42 on Apr 30,2021
+# Start time: 16:22:47 on Apr 30,2021
 # vlog -work work ../src/fifo.v 
 # -- Compiling module fifo
 # 
 # Top level modules:
 # 	fifo
-# End time: 14:52:43 on Apr 30,2021, Elapsed time: 0:00:01
+# End time: 16:22:47 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 14:52:43 on Apr 30,2021
+# Start time: 16:22:47 on Apr 30,2021
 # vlog -work work ../src/grayscale.v 
 # -- Compiling module grayscale
 # 
 # Top level modules:
 # 	grayscale
-# End time: 14:52:43 on Apr 30,2021, Elapsed time: 0:00:00
+# End time: 16:22:48 on Apr 30,2021, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 14:52:43 on Apr 30,2021
-# vlog -work work ../src/sobel_op.v 
-# -- Compiling module sobel_op
+# Start time: 16:22:48 on Apr 30,2021
+# vlog -work work ../src/op_sobel.v 
+# -- Compiling module op_sobel
 # 
 # Top level modules:
-# 	sobel_op
-# End time: 14:52:43 on Apr 30,2021, Elapsed time: 0:00:00
+# 	op_sobel
+# End time: 16:22:48 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 14:52:43 on Apr 30,2021
-# vlog -work work ../src/sobel.v 
-# -- Compiling module sobel
+# Start time: 16:22:48 on Apr 30,2021
+# vlog -work work ../src/op_gaussian.v 
+# -- Compiling module op_gaussian
 # 
 # Top level modules:
-# 	sobel
-# End time: 14:52:43 on Apr 30,2021, Elapsed time: 0:00:00
+# 	op_gaussian
+# End time: 16:22:48 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 14:52:43 on Apr 30,2021
+# Start time: 16:22:48 on Apr 30,2021
+# vlog -work work ../src/op_padder.v 
+# -- Compiling module op_padder
+# 
+# Top level modules:
+# 	op_padder
+# End time: 16:22:48 on Apr 30,2021, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 16:22:48 on Apr 30,2021
 # vlog -work work ../src/dut_system.v 
 # -- Compiling module dut_system
 # 
 # Top level modules:
 # 	dut_system
-# End time: 14:52:43 on Apr 30,2021, Elapsed time: 0:00:00
+# End time: 16:22:48 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 14:52:43 on Apr 30,2021
+# Start time: 16:22:48 on Apr 30,2021
 # vlog -work work ../src/testbench.v 
 # -- Compiling module dut_testbench
 # 
 # Top level modules:
 # 	dut_testbench
-# End time: 14:52:44 on Apr 30,2021, Elapsed time: 0:00:01
+# End time: 16:22:49 on Apr 30,2021, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0
-# vsim "+notimingchecks" -L work work.dut_testbench -wlf testbench.wlf 
-# Start time: 14:52:44 on Apr 30,2021
-# Loading work.dut_testbench
-# Loading work.dut_system
-# Loading work.fifo
-# Loading work.grayscale
-# Loading work.sobel
-# Loading work.sobel_op
-# ** Warning: (vsim-WLF-5000) WLF file currently in use: testbench.wlf
-#           File in use by: julia  Hostname: LEG-ION  ProcessID: 27984
-#           Attempting to use alternate WLF file "./wlft5v7yz5".
-# ** Warning: (vsim-WLF-5001) Could not open WLF file: testbench.wlf
-#           Using alternate file: ./wlft5v7yz5
-# 
-# @ 300: Beginning simulation...
-# @ 300: Loading file                 tiny_64_32.bmp...
-# @ 300: Writing file                 tiny_sobel.bmp...
-# @ 215200: Simulation completed in 2149 cycles.
-# 
-# 
-# Total simulation cycle count: 2152
-# 
-# Total warning count: 0
-# Total error count: 0
-# 
-# ** Note: $stop    : ../src/testbench.v(161)
-#    Time: 215200 ns  Iteration: 2  Instance: /dut_testbench
-# Break in NamedBeginStat tb_process at ../src/testbench.v line 161
-# Stopped at ../src/testbench.v line 161
-# End time: 14:52:50 on Apr 30,2021, Elapsed time: 0:00:06
-# Errors: 0, Warnings: 2

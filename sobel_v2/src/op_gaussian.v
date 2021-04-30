@@ -1,6 +1,6 @@
 `timescale 1 ns / 1 ns
 
-module gaussian_op #(
+module op_gaussian #(
     parameter integer DWIDTH_IN = 8*5*5,
     parameter integer DWIDTH_OUT = 8
 ) (
@@ -10,7 +10,7 @@ module gaussian_op #(
     input [DWIDTH_IN-1:0] in,
     output reg [DWIDTH_OUT-1:0] out
 );
-    localparam [7:0] gauss_op [0:24] = {8'h02, 8'h04, 8'h05, 8'h04, 8'h02, 8'h04, 8'h09, 8'h0C, 8'h09, 8'h04, 8'h05, 8'h0C, 8'h0E, 8'h0C, 8'h05, 8'h04, 8'h09, 8'h0C, 8'h09, 8'h04, 8'h02, 8'h04, 8'h05, 8'h04, 8'h02};
+    localparam [7:0] gauss_op [0:24] = '{8'h02, 8'h04, 8'h05, 8'h04, 8'h02, 8'h04, 8'h09, 8'h0C, 8'h09, 8'h04, 8'h05, 8'h0C, 8'h0E, 8'h0C, 8'h05, 8'h04, 8'h09, 8'h0C, 8'h09, 8'h04, 8'h02, 8'h04, 8'h05, 8'h04, 8'h02};
     localparam [7:0] denom = 8'b10011111; //159
 
     //max numerator calculation:
@@ -22,26 +22,19 @@ module gaussian_op #(
 
     reg [7:0] data [0:DWIDTH_IN/8-1];
 
-    function [15:0] abs;
-        input [15:0] val;
-        begin
-            abs = (val[15] == 1'b1) ? -val : val;
+    // maps in (200 bits) to data (25 array of 8 bits)
+    integer a;
+    always @* begin
+        for (a=0; a<DWIDTH_IN/8; a=a+1) begin
+            data[a] = in[a*8 +: 8];
         end
-    endfunction
+    end
 
     always @(posedge clock) begin
         if (reset == 1'b1) begin
             out <= 'h0;
         end else begin
             out <= out_c;
-        end
-    end
-
-    // maps in (200 bits) to data (25 array of 8 bits)
-    integer a;
-    always @* begin
-        for (a=0; a<DWIDTH_IN/8; a=a+1) begin
-            data[a] = in[a*8 +: 8];
         end
     end
 

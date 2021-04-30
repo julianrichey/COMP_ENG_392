@@ -4,7 +4,9 @@ architecture
 rgb fifo (width=24, depth=2)
 grayscale
 grayscale fifo (width=8, depth=2)
-sobel, sobel_op
+op_padder, op_gaussian
+gaussian fifo
+op_padder, op_sobel
 sobel fifo (width=8, depth=2)
 */
 
@@ -17,6 +19,8 @@ module dut_system #(
     parameter integer RGB_BUFFER,
     parameter integer GRAYSCALE_DWIDTH,
     parameter integer GRAYSCALE_BUFFER,
+    parameter integer GAUSSIAN_DWIDTH,
+    parameter integer GAUSSIAN_BUFFER,
     parameter integer SOBEL_DWIDTH,
     parameter integer SOBEL_BUFFER
 ) (
@@ -44,10 +48,20 @@ module dut_system #(
     wire [GRAYSCALE_DWIDTH-1:0] fifo_grayscale_din;
     wire fifo_grayscale_full;
 
-    //grayscale fifo to sobel
+    //grayscale fifo to gaussian
     wire fifo_grayscale_rd_en;
     wire [GRAYSCALE_DWIDTH-1:0] fifo_grayscale_dout;
     wire fifo_grayscale_empty;
+
+    //gaussian to gaussian fifo
+    wire fifo_gaussian_wr_en;
+    wire [GRAYSCALE_DWIDTH-1:0] fifo_gaussian_din;
+    wire fifo_gaussian_full;
+
+    //gaussian fifo to sobel
+    wire fifo_gaussian_rd_en;
+    wire [GRAYSCALE_DWIDTH-1:0] fifo_gaussian_dout;
+    wire fifo_gaussian_empty;
 
     //sobel to sobel fifo
     wire fifo_sobel_wr_en;
@@ -100,19 +114,54 @@ module dut_system #(
         .empty(fifo_grayscale_empty)
     );
 
-    sobel #(
-        .WINDOW_SIZE(3),
+    op_padder #(
+        .OP(1),
+        .WINDOW_SIZE(5),
         .STRIDE(1),
         .DWIDTH_IN(GRAYSCALE_DWIDTH),
+        .DWIDTH_OUT(GAUSSIAN_DWIDTH),
+        .IMG_WIDTH(IMG_WIDTH),
+        .IMG_HEIGHT(IMG_HEIGHT)
+    ) gaussian_0 (
+        .clock(clock),
+        .reset(reset),
+        .fifo_in_rd_en(fifo_grayscale_rd_en),
+        .fifo_in_dout(fifo_grayscale_dout),
+        .fifo_in_empty(fifo_grayscale_empty),
+        .fifo_out_wr_en(fifo_gaussian_wr_en),
+        .fifo_out_din(fifo_gaussian_din),
+        .fifo_out_full(fifo_gaussian_full)
+    );
+
+    fifo #(
+        .FIFO_DATA_WIDTH(GAUSSIAN_DWIDTH),
+        .FIFO_BUFFER_SIZE(GAUSSIAN_BUFFER)
+    ) fifo_gaussian (
+        .rd_clk(clock),
+        .wr_clk(clock),
+        .reset(reset),
+        .rd_en(fifo_gaussian_rd_en),
+        .wr_en(fifo_gaussian_wr_en),
+        .din(fifo_gaussian_din),
+        .dout(fifo_gaussian_dout),
+        .full(fifo_gaussian_full),
+        .empty(fifo_gaussian_empty)
+    );
+
+    op_padder #(
+        .OP(0),
+        .WINDOW_SIZE(3),
+        .STRIDE(1),
+        .DWIDTH_IN(GAUSSIAN_DWIDTH),
         .DWIDTH_OUT(SOBEL_DWIDTH),
         .IMG_WIDTH(IMG_WIDTH),
         .IMG_HEIGHT(IMG_HEIGHT)
     ) sobel_0 (
         .clock(clock),
         .reset(reset),
-        .fifo_in_rd_en(fifo_grayscale_rd_en),
-        .fifo_in_dout(fifo_grayscale_dout),
-        .fifo_in_empty(fifo_grayscale_empty),
+        .fifo_in_rd_en(fifo_gaussian_rd_en),
+        .fifo_in_dout(fifo_gaussian_dout),
+        .fifo_in_empty(fifo_gaussian_empty),
         .fifo_out_wr_en(fifo_sobel_wr_en),
         .fifo_out_din(fifo_sobel_din),
         .fifo_out_full(fifo_sobel_full)

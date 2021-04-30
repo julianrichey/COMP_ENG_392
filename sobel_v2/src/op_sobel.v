@@ -1,6 +1,6 @@
 `timescale 1 ns / 1 ns
 
-module sobel_op #(
+module op_sobel #(
     parameter integer DWIDTH_IN = 8*3*3,
     parameter integer DWIDTH_OUT = 8
 ) (
@@ -25,19 +25,19 @@ module sobel_op #(
         end
     endfunction
 
-    always @(posedge clock) begin
-        if (reset == 1'b1) begin
-            out <= 'h0;
-        end else begin
-            out <= out_c;
-        end
-    end
-
     // maps in (72 bits) to data (9 array of 8 bits)
     integer a;
     always @* begin
         for (a=0; a<DWIDTH_IN/8; a=a+1) begin
             data[a] = in[a*8 +: 8];
+        end
+    end
+
+    always @(posedge clock) begin
+        if (reset == 1'b1) begin
+            out <= 'h0;
+        end else begin
+            out <= out_c;
         end
     end
 
