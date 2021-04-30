@@ -5,65 +5,84 @@
 # vmap work work 
 # Modifying modelsim.ini
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 16:22:47 on Apr 30,2021
+# Start time: 17:11:15 on Apr 30,2021
 # vlog -work work ../src/fifo.v 
 # -- Compiling module fifo
 # 
 # Top level modules:
 # 	fifo
-# End time: 16:22:47 on Apr 30,2021, Elapsed time: 0:00:00
+# End time: 17:11:15 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 16:22:47 on Apr 30,2021
+# Start time: 17:11:15 on Apr 30,2021
 # vlog -work work ../src/grayscale.v 
 # -- Compiling module grayscale
 # 
 # Top level modules:
 # 	grayscale
-# End time: 16:22:48 on Apr 30,2021, Elapsed time: 0:00:01
+# End time: 17:11:15 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 16:22:48 on Apr 30,2021
+# Start time: 17:11:15 on Apr 30,2021
 # vlog -work work ../src/op_sobel.v 
 # -- Compiling module op_sobel
 # 
 # Top level modules:
 # 	op_sobel
-# End time: 16:22:48 on Apr 30,2021, Elapsed time: 0:00:00
+# End time: 17:11:15 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 16:22:48 on Apr 30,2021
+# Start time: 17:11:15 on Apr 30,2021
 # vlog -work work ../src/op_gaussian.v 
 # -- Compiling module op_gaussian
 # 
 # Top level modules:
 # 	op_gaussian
-# End time: 16:22:48 on Apr 30,2021, Elapsed time: 0:00:00
+# End time: 17:11:16 on Apr 30,2021, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 16:22:48 on Apr 30,2021
+# Start time: 17:11:16 on Apr 30,2021
 # vlog -work work ../src/op_padder.v 
 # -- Compiling module op_padder
 # 
 # Top level modules:
 # 	op_padder
-# End time: 16:22:48 on Apr 30,2021, Elapsed time: 0:00:00
+# End time: 17:11:16 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 16:22:48 on Apr 30,2021
+# Start time: 17:11:16 on Apr 30,2021
 # vlog -work work ../src/dut_system.v 
 # -- Compiling module dut_system
 # 
 # Top level modules:
 # 	dut_system
-# End time: 16:22:48 on Apr 30,2021, Elapsed time: 0:00:00
+# End time: 17:11:16 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 16:22:48 on Apr 30,2021
+# Start time: 17:11:16 on Apr 30,2021
 # vlog -work work ../src/testbench.v 
 # -- Compiling module dut_testbench
 # 
 # Top level modules:
 # 	dut_testbench
-# End time: 16:22:49 on Apr 30,2021, Elapsed time: 0:00:01
+# End time: 17:11:16 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
+# vsim "+notimingchecks" -L work work.dut_testbench -wlf testbench.wlf 
+# Start time: 17:11:16 on Apr 30,2021
+# Loading work.dut_testbench
+# Loading work.dut_system
+# Loading work.fifo
+# Loading work.grayscale
+# Loading work.op_padder
+# Loading work.op_gaussian
+# Loading work.op_sobel
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: testbench.wlf
+#           File in use by: julia  Hostname: LEG-ION  ProcessID: 27984
+#           Attempting to use alternate WLF file "./wlfth3ghaq".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: testbench.wlf
+#           Using alternate file: ./wlfth3ghaq
+# ** UI-Msg: (vish-4014) No objects found matching '/dut_testbench/dut_system_inst/gaussian_0/op_gaussian_0/*'.
+# Error in macro ./wave.do line 21
+# ** UI-Msg: (vish-4014) No objects found matching '/dut_testbench/dut_system_inst/gaussian_0/op_gaussian_0/*'.
+#     while executing
+# "add wave -noupdate -group dut_testbench/dut_system_inst/gaussian_0/op_gaussian_0 -radix hexadecimal /dut_testbench/dut_system_inst/gaussian_0/op_gauss..."

@@ -115,7 +115,7 @@ module dut_system #(
     );
 
     op_padder #(
-        .OP(1),
+        .OP(0),
         .WINDOW_SIZE(5),
         .STRIDE(1),
         .DWIDTH_IN(GRAYSCALE_DWIDTH),
@@ -149,7 +149,7 @@ module dut_system #(
     );
 
     op_padder #(
-        .OP(0),
+        .OP(1),
         .WINDOW_SIZE(3),
         .STRIDE(1),
         .DWIDTH_IN(GAUSSIAN_DWIDTH),
