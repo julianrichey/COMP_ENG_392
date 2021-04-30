@@ -5,70 +5,70 @@
 # vmap work work 
 # Modifying modelsim.ini
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 17:11:15 on Apr 30,2021
+# Start time: 18:43:14 on Apr 30,2021
 # vlog -work work ../src/fifo.v 
 # -- Compiling module fifo
 # 
 # Top level modules:
 # 	fifo
-# End time: 17:11:15 on Apr 30,2021, Elapsed time: 0:00:00
+# End time: 18:43:15 on Apr 30,2021, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 17:11:15 on Apr 30,2021
+# Start time: 18:43:15 on Apr 30,2021
 # vlog -work work ../src/grayscale.v 
 # -- Compiling module grayscale
 # 
 # Top level modules:
 # 	grayscale
-# End time: 17:11:15 on Apr 30,2021, Elapsed time: 0:00:00
+# End time: 18:43:15 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 17:11:15 on Apr 30,2021
+# Start time: 18:43:15 on Apr 30,2021
 # vlog -work work ../src/op_sobel.v 
 # -- Compiling module op_sobel
 # 
 # Top level modules:
 # 	op_sobel
-# End time: 17:11:15 on Apr 30,2021, Elapsed time: 0:00:00
+# End time: 18:43:15 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 17:11:15 on Apr 30,2021
+# Start time: 18:43:15 on Apr 30,2021
 # vlog -work work ../src/op_gaussian.v 
 # -- Compiling module op_gaussian
 # 
 # Top level modules:
 # 	op_gaussian
-# End time: 17:11:16 on Apr 30,2021, Elapsed time: 0:00:01
+# End time: 18:43:15 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 17:11:16 on Apr 30,2021
+# Start time: 18:43:15 on Apr 30,2021
 # vlog -work work ../src/op_padder.v 
 # -- Compiling module op_padder
 # 
 # Top level modules:
 # 	op_padder
-# End time: 17:11:16 on Apr 30,2021, Elapsed time: 0:00:00
+# End time: 18:43:15 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 17:11:16 on Apr 30,2021
+# Start time: 18:43:15 on Apr 30,2021
 # vlog -work work ../src/dut_system.v 
 # -- Compiling module dut_system
 # 
 # Top level modules:
 # 	dut_system
-# End time: 17:11:16 on Apr 30,2021, Elapsed time: 0:00:00
+# End time: 18:43:16 on Apr 30,2021, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 17:11:16 on Apr 30,2021
+# Start time: 18:43:16 on Apr 30,2021
 # vlog -work work ../src/testbench.v 
 # -- Compiling module dut_testbench
 # 
 # Top level modules:
 # 	dut_testbench
-# End time: 17:11:16 on Apr 30,2021, Elapsed time: 0:00:00
+# End time: 18:43:16 on Apr 30,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # vsim "+notimingchecks" -L work work.dut_testbench -wlf testbench.wlf 
-# Start time: 17:11:16 on Apr 30,2021
+# Start time: 18:43:16 on Apr 30,2021
 # Loading work.dut_testbench
 # Loading work.dut_system
 # Loading work.fifo
@@ -78,11 +78,24 @@
 # Loading work.op_sobel
 # ** Warning: (vsim-WLF-5000) WLF file currently in use: testbench.wlf
 #           File in use by: julia  Hostname: LEG-ION  ProcessID: 27984
-#           Attempting to use alternate WLF file "./wlfth3ghaq".
+#           Attempting to use alternate WLF file "./wlftiz9jz9".
 # ** Warning: (vsim-WLF-5001) Could not open WLF file: testbench.wlf
-#           Using alternate file: ./wlfth3ghaq
-# ** UI-Msg: (vish-4014) No objects found matching '/dut_testbench/dut_system_inst/gaussian_0/op_gaussian_0/*'.
-# Error in macro ./wave.do line 21
-# ** UI-Msg: (vish-4014) No objects found matching '/dut_testbench/dut_system_inst/gaussian_0/op_gaussian_0/*'.
-#     while executing
-# "add wave -noupdate -group dut_testbench/dut_system_inst/gaussian_0/op_gaussian_0 -radix hexadecimal /dut_testbench/dut_system_inst/gaussian_0/op_gauss..."
+#           Using alternate file: ./wlftiz9jz9
+# 
+# @ 300: Beginning simulation...
+# @ 300: Loading file                 tiny_64_32.bmp...
+# @ 300: Writing file                 tiny_sobel.bmp...
+# @ 228600: Simulation completed in 2283 cycles.
+# 
+# 
+# Total simulation cycle count: 2286
+# 
+# Total warning count: 0
+# Total error count: 0
+# 
+# ** Note: $stop    : ../src/testbench.v(167)
+#    Time: 228600 ns  Iteration: 2  Instance: /dut_testbench
+# Break in NamedBeginStat tb_process at ../src/testbench.v line 167
+# Stopped at ../src/testbench.v line 167
+# End time: 18:52:49 on Apr 30,2021, Elapsed time: 0:09:33
+# Errors: 0, Warnings: 2

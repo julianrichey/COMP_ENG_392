@@ -43,7 +43,7 @@ module op_gaussian #(
         num = 16'h0000;
         for (i=0; i<5; i=i+1) begin
             for (j=0; j<5; j=j+1) begin
-                num = num + ({8'h00,in[i*5 + j]} * {8'h00,gauss_op[j*5 + i]});
+                num = num + ({8'h00,data[i*5 + j]} * {8'h00,gauss_op[j*5 + i]});
             end
         end
 
