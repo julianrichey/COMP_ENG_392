@@ -19,7 +19,7 @@ This doesn't matter too much, but was a good time.
 4. write a 'gaussian_op'
     this file should be exact same, just instantiate a different module
 5. verify gaussian against c output
-6. parameterize stride
+6. parameterize stride?!
     might be easy or hard... not sure yet. dont worry about until later
 7. make sure this works in a loop of prologue->image->epilogue to process multiple frames
 
@@ -34,6 +34,21 @@ window is smaller than image
 
 `timescale 1 ns / 1 ns
 
+`define CLOG2(x) \
+    (x <= 2) ? 1 : \
+    (x <= 4) ? 2 : \
+    (x <= 8) ? 3 : \
+    (x <= 16) ? 4 : \
+    (x <= 32) ? 5 : \
+    (x <= 64) ? 6 : \
+    (x <= 128) ? 7 : \
+    (x <= 256) ? 8 : \
+    (x <= 512) ? 9 : \
+    (x <= 1024) ? 10 : \
+    (x <= 2048) ? 11 : \
+    (x <= 4096) ? 12 : \
+    -1
+
 module sobel #(
     parameter integer WINDOW_SIZE,
     parameter integer STRIDE,
@@ -47,46 +62,32 @@ module sobel #(
     input wire clock,
     input wire reset,
 
-    //in
     output reg fifo_in_rd_en, 
     input [DWIDTH_IN-1:0] fifo_in_dout, 
     input fifo_in_empty,
 
-    //out
     output reg fifo_out_wr_en,
     output reg [DWIDTH_OUT-1:0] fifo_out_din,
     input fifo_out_full
 );
     wire [DWIDTH_OUT-1:0] fifo_out_din_c;
-    reg fifo_out_wr_en_next_c; //probably need a tiny shift reg for this? i will see how many cycles back this needs to be pushed
-    reg fifo_out_wr_en_next;
-    reg [3:0] fifo_out_wr_en_shift_reg;
-
-    //assume these for now
-    //DWIDTH_IN = 8
-    //DWIDTH_OUT = 8
-
+    reg fifo_out_wr_en_shift_reg_c;
+    reg [1:0] fifo_out_wr_en_shift_reg;
 
     reg [1:0] state,state_c;
     localparam PROLOGUE = 2'b00; //input, no output
-    localparam MIDDLOGUE = 2'b01; //output on right edge, input on left edge, input and output otherwise
+    localparam MIDDLOGUE = 2'b01; //input and output
     localparam EPILOGUE = 2'b10; //no input, output
-    localparam TEMP_END_STATE = 2'b11;
+    localparam TEMP_END_STATE = 2'b11; //nothing
 
-
-
-    //for 3x3: 720*2 + 3 = 1443 WAIT THIS NEEDS TO INCLUDE PADDING
-    //for 5x5: 720*4 + 5 = 2885
     localparam integer PADDING = WINDOW_SIZE / 2;
     localparam integer REG_SIZE = IMG_WIDTH*(WINDOW_SIZE-1) + WINDOW_SIZE + PADDING*(WINDOW_SIZE-1)*2; 
-    reg [7:0] shift_reg [0:REG_SIZE-1]; //todo: change everything to use dwidth_in, dwidth_out
-    reg [7:0] shift_reg_c [0:REG_SIZE-1];
+    reg [DWIDTH_IN-1:0] shift_reg [0:REG_SIZE-1];
+    reg [DWIDTH_IN-1:0] shift_reg_c [0:REG_SIZE-1];
     
-    //for continuous reading and writing
-    reg [7:0] edge_storage [0:PADDING-1];
-    reg [7:0] edge_storage_c [0:PADDING-1];
-    
-
+    //for continuous reading and writing. otherwise, could only do one at a time on edges.
+    reg [DWIDTH_IN-1:0] edge_storage [0:PADDING-1];
+    reg [DWIDTH_IN-1:0] edge_storage_c [0:PADDING-1];
 
     
     reg [(DWIDTH_IN*WINDOW_SIZE*WINDOW_SIZE)-1:0] window;
@@ -94,7 +95,7 @@ module sobel #(
     always @* begin
         for (ii=0; ii<WINDOW_SIZE; ii=ii+1) begin
             for (jj=0; jj<WINDOW_SIZE; jj=jj+1) begin
-                window[(ii*WINDOW_SIZE + jj)*8 +: 8] = shift_reg[ii*(IMG_WIDTH+PADDING*2) + jj];
+                window[(ii*WINDOW_SIZE + jj)*DWIDTH_IN +: DWIDTH_IN] = shift_reg[ii*(IMG_WIDTH+PADDING*2) + jj];
             end
         end
     end
@@ -109,8 +110,8 @@ module sobel #(
     );
 
 
-    reg [12:0] x,x_c;
-    reg [12:0] y,y_c; //todo: include the log2 function here, use it to parameterize size of x, y
+    reg [`CLOG2(IMG_WIDTH)-1:0] x,x_c;
+    reg [`CLOG2(IMG_HEIGHT)-1:0] y,y_c;
     integer iii;
     always @(posedge clock) begin
         if (reset == 1'b1) begin
@@ -123,11 +124,11 @@ module sobel #(
             for (iii=0; iii<PADDING; iii=iii+1) begin
                 edge_storage[iii] <= 'b0;
             end
-
             fifo_out_din <= 'b0;
-            fifo_out_wr_en_next <= 1'b0;
             fifo_out_wr_en_shift_reg[0] <= 1'b0;
+            fifo_out_wr_en_shift_reg[1] <= 1'b0;
             fifo_out_wr_en <= 1'b0;
+
         end else begin
             state <= state_c;
             x <= x_c;
@@ -138,15 +139,13 @@ module sobel #(
             for (iii=0; iii<PADDING; iii=iii+1) begin
                 edge_storage[iii] <= edge_storage_c[iii];
             end
-
             fifo_out_din <= fifo_out_din_c;
-            fifo_out_wr_en_next <= fifo_out_wr_en_next_c;
-            fifo_out_wr_en_shift_reg[0] <= fifo_out_wr_en_next;
-            // fifo_out_wr_en_shift_reg[1] <= fifo_out_wr_en_shift_reg[0];
-            // fifo_out_wr_en_shift_reg[2] <= fifo_out_wr_en_shift_reg[1];
-            fifo_out_wr_en <= fifo_out_wr_en_shift_reg[0];
+            fifo_out_wr_en_shift_reg[0] <= fifo_out_wr_en_shift_reg_c;
+            fifo_out_wr_en_shift_reg[1] <= fifo_out_wr_en_shift_reg[0];
+            fifo_out_wr_en <= fifo_out_wr_en_shift_reg[1];
         end
     end
+
 
     integer i;
     always @* begin
@@ -161,22 +160,54 @@ module sobel #(
         end
 
         fifo_in_rd_en = 1'b0;
-        fifo_out_wr_en_next_c = 1'b0;
+        fifo_out_wr_en_shift_reg_c = 1'b0;
 
+        //states:
+        //  prologue - read every cycle, no write
+        //  middlogue - read and write every cycle. on right edges, store to edge_storage temporarily
+        //  epilogue - write every cycle, no read
+
+        //structure of conditions:
+        //  x=padding - the start of each row
+        //  x>=img_width - PADDING cycles of writing to edge_storage
+        //      within these, there is a check
+        //      one case is for when still writing to edge_storage
+        //      other case is going to next row
+        //  else - normally increment
+
+        //special cases:
+        //  in prologue, start at x=0 instead of x=padding
+        //      here, clear shift_reg, which serves as the bottom edge padding
+        //  each has their own conditions to transition to the next state
         case (state)
             PROLOGUE: begin
                 if (fifo_in_empty == 1'b0) begin
                     fifo_in_rd_en = 1'b1;
 
-                    if (x == 0 && y == 0) begin //clear out shift_reg for new frame
+                    if (x == 0 && y == 0) begin
                         for (i=1; i<REG_SIZE; i=i+1) begin
-                            shift_reg_c[i] = 'b0;
+                            shift_reg_c[i] = 'b0; //clear out shift_reg for new frame
                         end
-                        shift_reg_c[0] = fifo_in_dout; //some of the cleared out portion 'is' the padding on the bottom edge
+                        shift_reg_c[0] = fifo_in_dout;
                         x_c = x + 'b1;
                         y_c = y;
 
-                    end else if (x >= IMG_WIDTH) begin //changed to be like middlogue
+                    end else if (x == PADDING && y > 0) begin //first time x=padding, edge_storage not filled, bc start from x=0,y=0
+                        for (i=WINDOW_SIZE; i<REG_SIZE; i=i+1) begin
+                            shift_reg_c[i] = shift_reg[i-WINDOW_SIZE];
+                        end
+                        for (i=PADDING+1; i<WINDOW_SIZE; i=i+i) begin
+                            shift_reg_c[i] = 'b0;
+                        end
+                        for (i=1; i<PADDING+1; i=i+i) begin
+                            shift_reg_c[i] = edge_storage[i-1];
+                        end
+                        shift_reg_c[0] = fifo_in_dout;
+
+                        x_c = x + 'b1;
+                        y_c = y;
+
+                    end else if (x >= IMG_WIDTH) begin
                         for (i=1; i<REG_SIZE; i=i+1) begin
                             shift_reg_c[i] = shift_reg[i-1];
                         end
@@ -188,12 +219,12 @@ module sobel #(
                         end else begin
                             x_c = PADDING;
                             y_c = y + 'b1;
-                            if (y == PADDING - 1) begin
+                            if (y == PADDING-1) begin
                                 state_c = MIDDLOGUE;
                             end
                         end
                         
-                    end else begin //todo: will need to handle receiving from edge storage for any greater than 3x3
+                    end else begin
                         for (i=1; i<REG_SIZE; i=i+1) begin
                             shift_reg_c[i] = shift_reg[i-1];
                         end
@@ -207,9 +238,25 @@ module sobel #(
             MIDDLOGUE: begin
                 if (fifo_in_empty == 1'b0 && fifo_out_full == 1'b0) begin
                     fifo_in_rd_en = 1'b1;
-                    fifo_out_wr_en_next_c = 1'b1;
+                    fifo_out_wr_en_shift_reg_c = 1'b1;
 
-                    if (x >= IMG_WIDTH) begin //store one read per cycle, even if still on right edge
+
+                    if (x == PADDING) begin //shift, pad, consume edge_storage, fill current
+                        for (i=WINDOW_SIZE; i<REG_SIZE; i=i+1) begin
+                            shift_reg_c[i] = shift_reg[i-WINDOW_SIZE];
+                        end
+                        for (i=PADDING+1; i<WINDOW_SIZE; i=i+i) begin
+                            shift_reg_c[i] = 'b0;
+                        end
+                        for (i=1; i<PADDING+1; i=i+i) begin
+                            shift_reg_c[i] = edge_storage[i-1];
+                        end
+                        shift_reg_c[0] = fifo_in_dout;
+
+                        x_c = x + 'b1;
+                        y_c = y;
+
+                    end else if (x >= IMG_WIDTH) begin //store one read per cycle, even if still on right edge
                         for (i=1; i<REG_SIZE; i=i+1) begin
                             shift_reg_c[i] = shift_reg[i-1];
                         end
@@ -222,29 +269,6 @@ module sobel #(
                             x_c = PADDING;
                             y_c = y + 'b1;
                         end
-
-                    end else if (x == PADDING) begin //consume all stored reads in one go
-                    //this parameterization will need to work. why doesnt it yet? probably just off by 1 somewhere
-                        // for (i=WINDOW_SIZE; i<REG_SIZE; i=i+1) begin
-                        //     shift_reg_c[i] = shift_reg[i-WINDOW_SIZE];
-                        // end
-                        // for (i=0; i<PADDING; i=i+i) begin
-                        //     shift_reg_c[i+PADDING+1] = 'b0;
-                        // end
-                        // for (i=0; i<PADDING; i=i+i) begin
-                        //     shift_reg_c[i+1] = edge_storage[i];
-                        // end
-                        // shift_reg_c[0] = fifo_in_dout;
-
-                        for (i=3; i<REG_SIZE; i=i+1) begin
-                            shift_reg_c[i] = shift_reg[i-3];
-                        end
-                        shift_reg_c[2] = 'b0;
-                        shift_reg_c[1] = edge_storage[0];
-                        shift_reg_c[0] = fifo_in_dout;
-
-                        x_c = x + 'b1;
-                        y_c = y;
 
                     end else begin
                         for (i=1; i<REG_SIZE; i=i+1) begin
@@ -264,29 +288,56 @@ module sobel #(
 
             EPILOGUE: begin
                 if (fifo_out_full == 1'b0) begin
-                    fifo_out_wr_en_next_c = 1'b1;
+                    fifo_out_wr_en_shift_reg_c = 1'b1;
 
-                    if (x == IMG_WIDTH+PADDING-1 && y == IMG_HEIGHT+PADDING-1) begin
-                        state_c = TEMP_END_STATE;
-                        x_c = 'b0;
-                        y_c = 'b0;
-                    end else if (x == PADDING) begin
+                    if (x == PADDING) begin
                         for (i=WINDOW_SIZE; i<REG_SIZE; i=i+1) begin
                             shift_reg_c[i] = shift_reg[i-WINDOW_SIZE];
                         end
-                        for (i=0; i<WINDOW_SIZE; i=i+1) begin
+                        for (i=PADDING+1; i<WINDOW_SIZE; i=i+i) begin
                             shift_reg_c[i] = 'b0;
                         end
+                        for (i=1; i<PADDING+1; i=i+i) begin
+                            shift_reg_c[i] = edge_storage[i-1];
+                        end
+                        shift_reg_c[0] = fifo_in_dout;
+
                         x_c = x + 'b1;
                         y_c = y;
+                        // for (i=WINDOW_SIZE; i<REG_SIZE; i=i+1) begin
+                        //     shift_reg_c[i] = shift_reg[i-WINDOW_SIZE];
+                        // end
+                        // for (i=0; i<WINDOW_SIZE; i=i+1) begin
+                        //     shift_reg_c[i] = 'b0;
+                        // end
+                        // x_c = x + 'b1;
+                        // y_c = y;
 
-                    end else if (x == IMG_WIDTH+PADDING-1) begin //todo: x>=, condition on x_c,y_c
+                    end else if (x >= IMG_WIDTH) begin
                         for (i=1; i<REG_SIZE; i=i+1) begin
                             shift_reg_c[i] = shift_reg[i-1];
                         end
                         shift_reg_c[0] = 'b0;
-                        x_c = PADDING;
-                        y_c = y + 'b1;
+
+                        if (y == IMG_HEIGHT+PADDING-1) begin //done, no more data to write to edge_storage
+                            if (x < IMG_WIDTH+PADDING-1) begin
+                                x_c = x + 'b1;
+                                y_c = y;
+                            end else begin
+                                state_c = TEMP_END_STATE;
+                                x_c = 'b0;
+                                y_c = 'b0;
+                            end
+                        end else begin
+                            edge_storage_c[IMG_WIDTH+PADDING-x-1] = fifo_in_dout;
+                            if (x < IMG_WIDTH+PADDING-1) begin
+                                x_c = x + 'b1;
+                                y_c = y;
+                            end else begin
+                                x_c = PADDING;
+                                y_c = y + 'b1;
+                            end
+                        end
 
                     end else begin
                         for (i=1; i<REG_SIZE; i=i+1) begin
@@ -300,17 +351,9 @@ module sobel #(
             end
 
             TEMP_END_STATE: begin
-                // for (i=1; i<REG_SIZE; i=i+1) begin
-                //     shift_reg_c[i] = shift_reg[i-1];
-                // end
-                // shift_reg_c[i] = 'b0;
+                //do nothing
+                //todo: just go back to prologue from epilogue for new frame
             end
         endcase
-
-        // for (ii=0; ii<WINDOW_SIZE; ii=ii+1) begin
-        //     for (jj=0; jj<WINDOW_SIZE; jj=jj+1) begin
-        //         window[ii*WINDOW_SIZE + jj] = shift_reg[ii*IMG_WIDTH + jj]; //shift_reg_c vs shift_reg??
-        //     end
-        // end
     end
 endmodule

@@ -10,7 +10,7 @@ z2
 cModel Technology
 dC:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel/sim
 vdut_system
-Z0 !s110 1619808375
+Z0 !s110 1619812363
 !i10b 1
 !s100 [U0bZAhnid>mke]HjiLA`0
 Z1 !s11b Dg1SIo80bB@j0V0VzS_@n1
@@ -20,13 +20,13 @@ Z3 dC:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim
 w1619585446
 8../src/dut_system.v
 F../src/dut_system.v
-!i122 1257
+!i122 1341
 L0 13 124
 Z4 OV;L;2020.1;71
 r1
 !s85 0
 31
-Z5 !s108 1619808374.000000
+Z5 !s108 1619812363.000000
 !s107 ../src/dut_system.v|
 !s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/dut_system.v|
 !s101 -O0
@@ -34,7 +34,7 @@ Z5 !s108 1619808374.000000
 Z6 o-O0 -work work
 Z7 tDisableOpt 1 Vlog01Compat 1 CvgOpt 0
 vdut_testbench
-R0
+!s110 1619812364
 !i10b 1
 !s100 ?L5BARzK1bdLVXJO?o?j^0
 R1
@@ -44,13 +44,13 @@ R3
 w1619781242
 8../src/testbench.v
 F../src/testbench.v
-!i122 1258
+!i122 1342
 L0 3 289
 R4
 r1
 !s85 0
 31
-!s108 1619808375.000000
+R5
 !s107 ../src/testbench.v|
 !s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/testbench.v|
 !s101 -O0
@@ -58,7 +58,7 @@ r1
 R6
 R7
 vfifo
-Z8 !s110 1619808374
+R0
 !i10b 1
 !s100 l0[:CPXjAThH6G@P73XcF0
 R1
@@ -68,13 +68,13 @@ R3
 w1619495075
 8../src/fifo.v
 F../src/fifo.v
-!i122 1253
+!i122 1337
 L0 18 47
 R4
 r1
 !s85 0
 31
-R5
+!s108 1619812362.000000
 !s107 ../src/fifo.v|
 !s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/fifo.v|
 !s101 -O0
@@ -82,7 +82,7 @@ R5
 R6
 R7
 vgrayscale
-R8
+R0
 !i10b 1
 !s100 ;C8dFeFO>c>CzXCAne@TT0
 R1
@@ -92,7 +92,7 @@ R3
 w1619578914
 8../src/grayscale.v
 F../src/grayscale.v
-!i122 1254
+!i122 1338
 L0 3 54
 R4
 r1
@@ -106,18 +106,18 @@ R5
 R6
 R7
 vsobel
-R8
+R0
 !i10b 1
-!s100 dQ><0`kF6eZd8UD<BWQS?0
+!s100 eUK3[c9_F@I5eK<S=Q5ib3
 R1
-IHg4`GY>;@04i]ghHg5_9L0
+I573n;O7>8NUSEBngczA1Y3
 R2
 R3
-w1619808353
+w1619812360
 8../src/sobel.v
 F../src/sobel.v
-!i122 1256
-L0 37 280
+!i122 1340
+L0 52 308
 R4
 r1
 !s85 0
@@ -130,7 +130,7 @@ R5
 R6
 R7
 vsobel_op
-R8
+R0
 !i10b 1
 !s100 4`JX]UaiNV8[DQ[V5^jI51
 R1
@@ -140,7 +140,7 @@ R3
 w1619808370
 8../src/sobel_op.v
 F../src/sobel_op.v
-!i122 1255
+!i122 1339
 L0 5 58
 R4
 r1
