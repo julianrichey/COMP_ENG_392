@@ -7,12 +7,10 @@ module grayscale #(
     input clock,
     input reset,
 
-    //fifo in
-    output reg fifo_in_rd_en, 
-    input [DWIDTH_IN-1:0] fifo_in_dout, 
+    output reg fifo_in_rd_en,
+    input [DWIDTH_IN-1:0] fifo_in_dout,
     input fifo_in_empty,
 
-    //fifo out
     output reg fifo_out_wr_en, 
     output reg [DWIDTH_OUT-1:0] fifo_out_din, 
     input fifo_out_full

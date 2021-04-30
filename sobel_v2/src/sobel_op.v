@@ -1,10 +1,8 @@
-//unclocked function vs clocked out??
-
 `timescale 1 ns / 1 ns
 
 module sobel_op #(
-    parameter integer DWIDTH_IN = 72, //8*9 bits
-    parameter integer DWIDTH_OUT = 8 //8 bits
+    parameter integer DWIDTH_IN = 8*3*3,
+    parameter integer DWIDTH_OUT = 8
 ) (
     input clock,
     input reset,
@@ -55,7 +53,7 @@ module sobel_op #(
         end
 
         v = (abs(hor_grad) + abs(vert_grad)) >> 1;
-        out_c = (v > 255) ? 255 : v[7:0];
+        out_c = (v > 16'h00FF) ? 8'hFF : v[7:0];
         // out_c = ({4'h0,in[71:64]} + {4'h0,in[63:56]} + {4'h0,in[55:48]} + {4'h0,in[47:40]} + {4'h0,in[39:32]} + {4'h0,in[31:24]} + {4'h0,in[23:16]} + {4'h0,in[15:8]} + {4'h0,in[7:0]}) / 9;
         // out_c = data[4];
     end

@@ -49,7 +49,9 @@ window is smaller than image
     (x <= 4096) ? 12 : \
     -1
 
-module sobel #(
+module padder #(
+    parameter integer OP,
+
     parameter integer WINDOW_SIZE,
     parameter integer STRIDE,
 
@@ -73,6 +75,9 @@ module sobel #(
     wire [DWIDTH_OUT-1:0] fifo_out_din_c;
     reg fifo_out_wr_en_shift_reg_c;
     reg [1:0] fifo_out_wr_en_shift_reg;
+
+    localparam OP_SOBEL = 4'h0;
+    localparam OP_GAUSSIAN = 4'h1;
 
     reg [1:0] state,state_c;
     localparam PROLOGUE = 2'b00; //input, no output
@@ -99,15 +104,27 @@ module sobel #(
             end
         end
     end
-    sobel_op #(
-        .DWIDTH_IN(DWIDTH_IN*WINDOW_SIZE*WINDOW_SIZE),
-        .DWIDTH_OUT(DWIDTH_OUT)
-    ) sobel_op_0 (
-        .clock(clock),
-        .reset(reset),
-        .in(window),
-        .out(fifo_out_din_c)
-    );
+
+    generate
+        case (OP)
+            OP_SOBEL: begin
+                sobel_op #(
+                    .DWIDTH_IN(DWIDTH_IN*WINDOW_SIZE*WINDOW_SIZE),
+                    .DWIDTH_OUT(DWIDTH_OUT)
+                ) sobel_op_0 (
+                    .clock(clock),
+                    .reset(reset),
+                    .in(window),
+                    .out(fifo_out_din_c)
+                );
+            end
+
+            OP_GAUSSIAN: begin
+                
+            end
+        endcase
+
+    endgenerate
 
 
     reg [`CLOG2(IMG_WIDTH)-1:0] x,x_c;
@@ -304,14 +321,6 @@ module sobel #(
 
                         x_c = x + 'b1;
                         y_c = y;
-                        // for (i=WINDOW_SIZE; i<REG_SIZE; i=i+1) begin
-                        //     shift_reg_c[i] = shift_reg[i-WINDOW_SIZE];
-                        // end
-                        // for (i=0; i<WINDOW_SIZE; i=i+1) begin
-                        //     shift_reg_c[i] = 'b0;
-                        // end
-                        // x_c = x + 'b1;
-                        // y_c = y;
 
                     end else if (x >= IMG_WIDTH) begin
                         for (i=1; i<REG_SIZE; i=i+1) begin
