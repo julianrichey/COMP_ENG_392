@@ -126,8 +126,8 @@ module sobel #(
 
             fifo_out_din <= 'b0;
             fifo_out_wr_en_next <= 1'b0;
-            fifo_out_wr_en <= 1'b0;
             fifo_out_wr_en_shift_reg[0] <= 1'b0;
+            fifo_out_wr_en <= 1'b0;
         end else begin
             state <= state_c;
             x <= x_c;
@@ -140,7 +140,6 @@ module sobel #(
             end
 
             fifo_out_din <= fifo_out_din_c;
-
             fifo_out_wr_en_next <= fifo_out_wr_en_next_c;
             fifo_out_wr_en_shift_reg[0] <= fifo_out_wr_en_next;
             // fifo_out_wr_en_shift_reg[1] <= fifo_out_wr_en_shift_reg[0];
@@ -173,7 +172,7 @@ module sobel #(
                         for (i=1; i<REG_SIZE; i=i+1) begin
                             shift_reg_c[i] = 'b0;
                         end
-                        shift_reg_c[0] = fifo_in_dout; //some of the cleared out portion is the padding on the bottom edge
+                        shift_reg_c[0] = fifo_in_dout; //some of the cleared out portion 'is' the padding on the bottom edge
                         x_c = x + 'b1;
                         y_c = y;
 
@@ -225,16 +224,25 @@ module sobel #(
                         end
 
                     end else if (x == PADDING) begin //consume all stored reads in one go
-                        for (i=WINDOW_SIZE; i<REG_SIZE; i=i+1) begin
-                            shift_reg_c[i] = shift_reg[i-WINDOW_SIZE];
+                        // for (i=WINDOW_SIZE; i<REG_SIZE; i=i+1) begin
+                        //     shift_reg_c[i] = shift_reg[i-WINDOW_SIZE];
+                        // end
+                        // for (i=0; i<PADDING; i=i+i) begin
+                        //     shift_reg_c[i+PADDING+1] = 'b0;
+                        // end
+                        // for (i=0; i<PADDING; i=i+i) begin
+                        //     shift_reg_c[i+1] = edge_storage[i];
+                        // end
+                        // shift_reg_c[0] = fifo_in_dout;
+
+                        for (i=3; i<REG_SIZE; i=i+1) begin
+                            shift_reg_c[i] = shift_reg[i-3];
                         end
-                        for (i=0; i<PADDING; i=i+i) begin
-                            shift_reg_c[i+PADDING+1] = 'b0;
-                        end
-                        for (i=0; i<PADDING; i=i+i) begin
-                            shift_reg_c[i+1] = edge_storage[i];
-                        end
+                        shift_reg_c[2] = 'b0;
+                        shift_reg_c[1] = edge_storage[i];
                         shift_reg_c[0] = fifo_in_dout;
+
+
                         x_c = x + 'b1;
                         y_c = y;
 
