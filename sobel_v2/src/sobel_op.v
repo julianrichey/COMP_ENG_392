@@ -12,26 +12,25 @@ module sobel_op #(
     input [DWIDTH_IN-1:0] in,
     output reg [DWIDTH_OUT-1:0] out
 );
+    localparam [7:0] horiz_op [0:8] = '{8'hFF, 8'h00, 8'h01, 8'hFE, 8'h00, 8'h02, 8'hFF, 8'h00, 8'h01};
+    localparam [7:0] vert_op [0:8] = '{8'hFF, 8'hFE, 8'hFF, 8'h00, 8'h00, 8'h00, 8'h01, 8'h02, 8'h01};
 
-    localparam signed [9*8-1:0] horiz_op = {8'shFF, 8'sh00, 8'sh01, 8'shFE, 8'sh00, 8'sh02, 8'shFF, 8'sh00, 8'sh01};
-    localparam signed [9*8-1:0] vert_op = {8'shFF, 8'shFE, 8'shFF, 8'sh00, 8'sh00, 8'sh00, 8'sh01, 8'sh02, 8'sh01};
-
-    reg signed [15:0] hor_grad, vert_grad, v;
+    reg [15:0] hor_grad, vert_grad, v;
     reg [DWIDTH_OUT-1:0] out_c;
 
-    reg signed [7:0] data [0:DWIDTH_IN/8-1];
+    reg [7:0] data [0:DWIDTH_IN/8-1];
 
-    function signed [15:0] abs;
+    function [15:0] abs;
         input [15:0] val;
         begin
-            abs = (val < 0) ? -val : val;
+            abs = (val[15] == 1'b1) ? -val : val;
         end
     endfunction
 
-    always @(posedge clock, posedge reset) begin
+    always @(posedge clock) begin
         if (reset == 1'b1) begin
             out <= 'h0;
-        end else if (clock == 1'b1) begin
+        end else begin
             out <= out_c;
         end
     end
@@ -50,12 +49,18 @@ module sobel_op #(
         vert_grad = 16'h0000;
         for (i=0; i<3; i=i+1) begin
             for (j=0; j<3; j=j+1) begin
-                hor_grad = hor_grad + (data[i*3 + j] * horiz_op[j*3 + i]);
-                vert_grad = vert_grad + (data[i*3 + j] * vert_op[j*3 + i]);
+                hor_grad = hor_grad + ($signed({{8{data[i*3 + j][7]}},data[i*3 + j]}) * $signed({{8{horiz_op[j*3 + i][7]}},horiz_op[j*3 + i]}));
+                vert_grad = vert_grad + ($signed({{8{data[i*3 + j][7]}},data[i*3 + j]}) * $signed({{8{vert_op[j*3 + i][7]}},vert_op[j*3 + i]}));
             end
         end
 
-        v = signed'(abs(hor_grad) + abs(vert_grad)) >>> 1;
-        out_c = (v > 16'sh00FF) ? 8'hFF : v[7:0];
+        v = (abs(hor_grad) + abs(vert_grad)) >> 1;
+        out_c = (v > 255) ? 255 : v[7:0];
+        // out_c = ({4'h0,in[71:64]} + {4'h0,in[63:56]} + {4'h0,in[55:48]} + {4'h0,in[47:40]} + {4'h0,in[39:32]} + {4'h0,in[31:24]} + {4'h0,in[23:16]} + {4'h0,in[15:8]} + {4'h0,in[7:0]}) / 9;
+        // out_c = data[4];
     end
 endmodule
+
+// 210
+// 543
+// 876
