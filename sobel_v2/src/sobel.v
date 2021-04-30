@@ -224,6 +224,7 @@ module sobel #(
                         end
 
                     end else if (x == PADDING) begin //consume all stored reads in one go
+                    //this parameterization will need to work. why doesnt it yet? probably just off by 1 somewhere
                         // for (i=WINDOW_SIZE; i<REG_SIZE; i=i+1) begin
                         //     shift_reg_c[i] = shift_reg[i-WINDOW_SIZE];
                         // end
@@ -239,9 +240,8 @@ module sobel #(
                             shift_reg_c[i] = shift_reg[i-3];
                         end
                         shift_reg_c[2] = 'b0;
-                        shift_reg_c[1] = edge_storage[i];
+                        shift_reg_c[1] = edge_storage[0];
                         shift_reg_c[0] = fifo_in_dout;
-
 
                         x_c = x + 'b1;
                         y_c = y;
@@ -260,47 +260,6 @@ module sobel #(
                         end
                     end
                 end
-
-                //this down here wasted cycles
-                // if (x == IMG_WIDTH && fifo_out_full == 1'b0) begin //right edge. x >= img_width?
-                //     fifo_out_wr_en_next_c = 1'b1;
-
-                //     for (i=1; i<REG_SIZE; i=i+1) begin
-                //         shift_reg_c[i] = shift_reg[i-1];
-                //     end
-                //     shift_reg_c[0] = 'b0;
-
-                //     x_c = 'b0;
-                //     y_c = y + 'b1;
-                    
-                // end else if (x == 0 && fifo_in_empty == 1'b0) begin //left edge. x < PADDING?
-                //     fifo_in_rd_en = 1'b1;
-
-                //     for (i=2; i<REG_SIZE; i=i+1) begin
-                //         shift_reg_c[i] = shift_reg[i-2];
-                //     end
-                //     shift_reg_c[1] = 'b0;
-                //     shift_reg_c[0] = fifo_in_dout;
-
-                //     x_c = x + 'b1;
-                //     y_c = y;
-
-                // end else if (fifo_in_empty == 1'b0 && fifo_out_full == 1'b0) begin
-                //     fifo_in_rd_en = 1'b1;
-                //     fifo_out_wr_en_next_c = 1'b1;
-
-                //     for (i=1; i<REG_SIZE; i=i+1) begin
-                //         shift_reg_c[i] = shift_reg[i-1];
-                //     end
-                //     shift_reg_c[0] = fifo_in_dout;
-
-                //     x_c = x + 'b1;
-                //     y_c = y;
-
-                //     if (x == IMG_WIDTH-1 && y == IMG_HEIGHT-1) begin
-                //         state_c = EPILOGUE;
-                //     end
-                // end
             end
 
             EPILOGUE: begin
@@ -311,15 +270,24 @@ module sobel #(
                         state_c = TEMP_END_STATE;
                         x_c = 'b0;
                         y_c = 'b0;
-                    end else if (x == IMG_WIDTH+PADDING-1) begin
-                        for (i=1+(PADDING*2); i<REG_SIZE; i=i+1) begin
-                            shift_reg_c[i] = shift_reg[i-1-(PADDING*2)];
+                    end else if (x == PADDING) begin
+                        for (i=WINDOW_SIZE; i<REG_SIZE; i=i+1) begin
+                            shift_reg_c[i] = shift_reg[i-WINDOW_SIZE];
                         end
-                        for (i=0; i<1+PADDING*2; i=i+1) begin
+                        for (i=0; i<WINDOW_SIZE; i=i+1) begin
                             shift_reg_c[i] = 'b0;
                         end
+                        x_c = x + 'b1;
+                        y_c = y;
+
+                    end else if (x == IMG_WIDTH+PADDING-1) begin //todo: x>=, condition on x_c,y_c
+                        for (i=1; i<REG_SIZE; i=i+1) begin
+                            shift_reg_c[i] = shift_reg[i-1];
+                        end
+                        shift_reg_c[0] = 'b0;
                         x_c = PADDING;
                         y_c = y + 'b1;
+
                     end else begin
                         for (i=1; i<REG_SIZE; i=i+1) begin
                             shift_reg_c[i] = shift_reg[i-1];
