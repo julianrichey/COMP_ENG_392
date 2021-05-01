@@ -2,6 +2,8 @@
 
 module dut_testbench();
 
+    localparam integer USE_GAUSSIAN = 0;
+
     //from memory to grayscale
     localparam integer RGB_DWIDTH = 8 * 3;
     localparam integer RGB_BUFFER = 16;
@@ -19,7 +21,7 @@ module dut_testbench();
     localparam integer SOBEL_BUFFER = 16;
     
     parameter [30*8-1:0] fifo_in_name = "tiny_64_32.bmp";
-    parameter [30*8-1:0] fifo_out_name = "tiny_sobel.bmp";
+    parameter [30*8-1:0] fifo_out_name = (USE_GAUSSIAN == 1) ? "tiny_gaussian.bmp" : "tiny_sobel.bmp";
     localparam integer bmp_width = 64;
     localparam integer bmp_height = 32;
 
@@ -98,6 +100,7 @@ module dut_testbench();
     */
 
     dut_system #(
+        .USE_GAUSSIAN(USE_GAUSSIAN),
         .IMG_WIDTH(bmp_width),
         .IMG_HEIGHT(bmp_height),
         .RGB_DWIDTH(RGB_DWIDTH),
