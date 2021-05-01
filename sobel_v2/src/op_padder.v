@@ -107,33 +107,6 @@ module op_padder #(
     end
 
 
-    // case (OP)
-    //     SOBEL_OP: begin
-    //         op_sobel #(
-    //             .DWIDTH_IN(DWIDTH_IN*WINDOW_SIZE*WINDOW_SIZE),
-    //             .DWIDTH_OUT(DWIDTH_OUT)
-    //         ) op_sobel_0 (
-    //             .clock(clock),
-    //             .reset(reset),
-    //             .in(window),
-    //             .out(fifo_out_din_c)
-    //         );
-    //     end
-
-    //     GAUSSIAN_OP: begin
-    //         op_gaussian #(
-    //             .DWIDTH_IN(DWIDTH_IN*WINDOW_SIZE*WINDOW_SIZE),
-    //             .DWIDTH_OUT(DWIDTH_OUT)
-    //         ) op_gaussian_0 (
-    //             .clock(clock),
-    //             .reset(reset),
-    //             .in(window),
-    //             .out(fifo_out_din_c)
-    //         );
-    //     end
-    // endcase
-
-
     if (OP == SOBEL_OP) begin
         op_sobel #(
             .DWIDTH_IN(DWIDTH_IN*WINDOW_SIZE*WINDOW_SIZE),
@@ -147,10 +120,14 @@ module op_padder #(
     end else if (OP == GAUSSIAN_OP) begin
         op_gaussian #(
             .DWIDTH_IN(DWIDTH_IN*WINDOW_SIZE*WINDOW_SIZE),
-            .DWIDTH_OUT(DWIDTH_OUT)
+            .DWIDTH_OUT(DWIDTH_OUT),
+            .IMG_WIDTH(IMG_WIDTH),
+            .IMG_HEIGHT(IMG_HEIGHT)
         ) op_gaussian_0 (
             .clock(clock),
             .reset(reset),
+            .x(x),
+            .y(y),
             .in(window),
             .out(fifo_out_din_c)
         );
