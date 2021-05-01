@@ -2,7 +2,7 @@
 
 module dut_testbench();
 
-    localparam integer USE_GAUSSIAN = 0;
+    localparam integer USE_GAUSSIAN = 1;
 
     //from memory to grayscale
     localparam integer RGB_DWIDTH = 8 * 3;

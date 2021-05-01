@@ -287,7 +287,7 @@ int main(int argc, char *argv[]) {
 	write_grayscale_bmp("stage1_gaussian.bmp", header, gb_data);
 
 	/// Sobel operator
-	sobel_filter(gs_data, height, width, sobel_data);
+	sobel_filter(gb_data, height, width, sobel_data); //1st input gs_data to disable gaussian
 	write_grayscale_bmp("stage2_sobel.bmp", header, sobel_data);
 
 	/// Non-maximum suppression

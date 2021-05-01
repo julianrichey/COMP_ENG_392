@@ -159,12 +159,16 @@ module op_padder #(
 
     reg [`CLOG2(IMG_WIDTH)-1:0] x,x_c;
     reg [`CLOG2(IMG_HEIGHT)-1:0] y,y_c;
+    reg [`CLOG2(IMG_WIDTH)-1:0] x_last;
+    reg [`CLOG2(IMG_HEIGHT)-1:0] y_last;
     integer iii;
     always @(posedge clock) begin
         if (reset == 1'b1) begin
             state <= PROLOGUE;
             x <= 'b0;
             y <= 'b0;
+            x_last <= 'b0;
+            y_last <= 'b0;
             for (iii=0; iii<REG_SIZE; iii=iii+1) begin
                 shift_reg[iii] <= 'b0;
             end
@@ -180,13 +184,29 @@ module op_padder #(
             state <= state_c;
             x <= x_c;
             y <= y_c;
+            x_last <= x;
+            y_last <= y;
             for (iii=0; iii<REG_SIZE; iii=iii+1) begin
                 shift_reg[iii] <= shift_reg_c[iii];
             end
             for (iii=0; iii<PADDING; iii=iii+1) begin
                 edge_storage[iii] <= edge_storage_c[iii];
             end
-            fifo_out_din <= fifo_out_din_c;
+            
+            //testing
+            //this is one way to make the edge rows+cols of sobel black
+            //just use the state of x/y corresponding to data coming out of op_sobel
+            //could manipulate the output of other operations here as well
+            if (OP == SOBEL_OP) begin
+                if (x_last > PADDING+1 && x_last < IMG_WIDTH+PADDING-1 && y_last > PADDING && y_last < IMG_HEIGHT+PADDING-1) begin
+                    fifo_out_din <= fifo_out_din_c;
+                end else begin
+                    fifo_out_din <= 'b0;
+                end
+            end else begin
+                fifo_out_din <= fifo_out_din_c;
+            end
+
             fifo_out_wr_en_shift_reg[0] <= fifo_out_wr_en_shift_reg_c;
             fifo_out_wr_en_shift_reg[1] <= fifo_out_wr_en_shift_reg[0];
             fifo_out_wr_en <= fifo_out_wr_en_shift_reg[1];
