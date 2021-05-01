@@ -5,70 +5,70 @@
 # vmap work work 
 # Modifying modelsim.ini
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 01:19:11 on May 01,2021
+# Start time: 01:34:06 on May 01,2021
 # vlog -work work ../src/fifo.v 
 # -- Compiling module fifo
 # 
 # Top level modules:
 # 	fifo
-# End time: 01:19:11 on May 01,2021, Elapsed time: 0:00:00
+# End time: 01:34:07 on May 01,2021, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 01:19:11 on May 01,2021
+# Start time: 01:34:07 on May 01,2021
 # vlog -work work ../src/grayscale.v 
 # -- Compiling module grayscale
 # 
 # Top level modules:
 # 	grayscale
-# End time: 01:19:12 on May 01,2021, Elapsed time: 0:00:01
+# End time: 01:34:07 on May 01,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 01:19:12 on May 01,2021
+# Start time: 01:34:07 on May 01,2021
 # vlog -work work ../src/op_sobel.v 
 # -- Compiling module op_sobel
 # 
 # Top level modules:
 # 	op_sobel
-# End time: 01:19:12 on May 01,2021, Elapsed time: 0:00:00
+# End time: 01:34:07 on May 01,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 01:19:12 on May 01,2021
+# Start time: 01:34:07 on May 01,2021
 # vlog -work work ../src/op_gaussian.v 
 # -- Compiling module op_gaussian
 # 
 # Top level modules:
 # 	op_gaussian
-# End time: 01:19:12 on May 01,2021, Elapsed time: 0:00:00
+# End time: 01:34:07 on May 01,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 01:19:12 on May 01,2021
+# Start time: 01:34:07 on May 01,2021
 # vlog -work work ../src/op_padder.v 
 # -- Compiling module op_padder
 # 
 # Top level modules:
 # 	op_padder
-# End time: 01:19:12 on May 01,2021, Elapsed time: 0:00:00
+# End time: 01:34:08 on May 01,2021, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 01:19:12 on May 01,2021
+# Start time: 01:34:08 on May 01,2021
 # vlog -work work ../src/dut_system.v 
 # -- Compiling module dut_system
 # 
 # Top level modules:
 # 	dut_system
-# End time: 01:19:12 on May 01,2021, Elapsed time: 0:00:00
+# End time: 01:34:08 on May 01,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 01:19:12 on May 01,2021
+# Start time: 01:34:08 on May 01,2021
 # vlog -work work ../src/testbench.v 
 # -- Compiling module dut_testbench
 # 
 # Top level modules:
 # 	dut_testbench
-# End time: 01:19:13 on May 01,2021, Elapsed time: 0:00:01
+# End time: 01:34:08 on May 01,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # vsim "+notimingchecks" -L work work.dut_testbench -wlf testbench.wlf 
-# Start time: 01:19:13 on May 01,2021
+# Start time: 01:34:08 on May 01,2021
 # Loading work.dut_testbench
 # Loading work.dut_system
 # Loading work.fifo
@@ -78,9 +78,9 @@
 # Loading work.op_sobel
 # ** Warning: (vsim-WLF-5000) WLF file currently in use: testbench.wlf
 #           File in use by: julia  Hostname: LEG-ION  ProcessID: 27984
-#           Attempting to use alternate WLF file "./wlftism16d".
+#           Attempting to use alternate WLF file "./wlftz3gmxy".
 # ** Warning: (vsim-WLF-5001) Could not open WLF file: testbench.wlf
-#           Using alternate file: ./wlftism16d
+#           Using alternate file: ./wlftz3gmxy
 # 
 # @ 300: Beginning simulation...
 # @ 300: Loading file                 tiny_64_32.bmp...
@@ -97,5 +97,5 @@
 #    Time: 228600 ns  Iteration: 2  Instance: /dut_testbench
 # Break in NamedBeginStat tb_process at ../src/testbench.v line 170
 # Stopped at ../src/testbench.v line 170
-# End time: 01:19:19 on May 01,2021, Elapsed time: 0:00:06
+# End time: 01:34:13 on May 01,2021, Elapsed time: 0:00:05
 # Errors: 0, Warnings: 2

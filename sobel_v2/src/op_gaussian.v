@@ -47,8 +47,9 @@ module op_gaussian #(
             end
         end
 
-        v = num / denom;
-        out_c = (v > 16'h00FF) ? 8'hFF : v[7:0];
+        out_c = num / denom;
+        //out_c = (v > 16'h00FF) ? 8'hFF : v[7:0];
+        // out_c = data[12];
     end
 
 

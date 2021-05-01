@@ -10,7 +10,7 @@ z2
 cModel Technology
 dC:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel/sim
 vdut_system
-Z0 !s110 1619849952
+Z0 !s110 1619850848
 !i10b 1
 !s100 kYIM9HhISalA^z;g^`2Eg0
 Z1 !s11b Dg1SIo80bB@j0V0VzS_@n1
@@ -20,13 +20,13 @@ Z3 dC:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim
 w1619833863
 8../src/dut_system.v
 F../src/dut_system.v
-!i122 1650
+!i122 1734
 L0 15 194
 Z4 OV;L;2020.1;71
 r1
 !s85 0
 31
-Z5 !s108 1619849952.000000
+Z5 !s108 1619850848.000000
 !s107 ../src/dut_system.v|
 !s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/dut_system.v|
 !s101 -O0
@@ -34,7 +34,7 @@ Z5 !s108 1619849952.000000
 Z6 o-O0 -work work
 Z7 tDisableOpt 1 Vlog01Compat 1 CvgOpt 0
 vdut_testbench
-!s110 1619849953
+R0
 !i10b 1
 !s100 P9no0VTF^QX02N0_@KOV@0
 R1
@@ -44,7 +44,7 @@ R3
 w1619849563
 8../src/testbench.v
 F../src/testbench.v
-!i122 1651
+!i122 1735
 L0 3 298
 R4
 r1
@@ -58,7 +58,7 @@ R5
 R6
 R7
 vfifo
-!s110 1619849951
+Z8 !s110 1619850847
 !i10b 1
 !s100 l0[:CPXjAThH6G@P73XcF0
 R1
@@ -68,13 +68,13 @@ R3
 w1619495075
 8../src/fifo.v
 F../src/fifo.v
-!i122 1645
+!i122 1729
 L0 18 47
 R4
 r1
 !s85 0
 31
-Z8 !s108 1619849951.000000
+!s108 1619850846.000000
 !s107 ../src/fifo.v|
 !s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/fifo.v|
 !s101 -O0
@@ -82,7 +82,7 @@ Z8 !s108 1619849951.000000
 R6
 R7
 vgrayscale
-R0
+R8
 !i10b 1
 !s100 @jHHg::`_1K;M5IE;ZJZ[2
 R1
@@ -92,13 +92,13 @@ R3
 w1619813123
 8../src/grayscale.v
 F../src/grayscale.v
-!i122 1646
+!i122 1730
 L0 3 52
 R4
 r1
 !s85 0
 31
-R8
+Z9 !s108 1619850847.000000
 !s107 ../src/grayscale.v|
 !s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/grayscale.v|
 !s101 -O0
@@ -106,23 +106,23 @@ R8
 R6
 R7
 vop_gaussian
-R0
+R8
 !i10b 1
-!s100 A6E=fXe1De^AaTI?J8K1k2
+!s100 ;nnh1AHD:C6bSYe=aokcX2
 R1
-I[=HK9:8cKWIlO?]T2M1T]2
+I3?lT0GFJ7g_UZXEFF^B3]3
 R2
 R3
-w1619826184
+w1619850840
 8../src/op_gaussian.v
 F../src/op_gaussian.v
-!i122 1648
-L0 3 53
+!i122 1732
+L0 3 54
 R4
 r1
 !s85 0
 31
-R5
+R9
 !s107 ../src/op_gaussian.v|
 !s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/op_gaussian.v|
 !s101 -O0
@@ -140,13 +140,13 @@ R3
 w1619849472
 8../src/op_padder.v
 F../src/op_padder.v
-!i122 1649
+!i122 1733
 L0 52 367
 R4
 r1
 !s85 0
 31
-R5
+R9
 !s107 ../src/op_padder.v|
 !s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/op_padder.v|
 !s101 -O0
@@ -154,7 +154,7 @@ R5
 R6
 R7
 vop_sobel
-R0
+R8
 !i10b 1
 !s100 SL`4@CSWD07I2QVHY8Nd^1
 R1
@@ -164,13 +164,13 @@ R3
 w1619816849
 8../src/op_sobel.v
 F../src/op_sobel.v
-!i122 1647
-Z9 L0 3 58
+!i122 1731
+Z10 L0 3 58
 R4
 r1
 !s85 0
 31
-R5
+R9
 !s107 ../src/op_sobel.v|
 !s90 -F=C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt|-F=|-work|work|../src/op_sobel.v|
 !s101 -O0
@@ -213,7 +213,7 @@ w1619816058
 8../src/sobel_op.v
 F../src/sobel_op.v
 !i122 1348
-R9
+R10
 R4
 r1
 !s85 0
