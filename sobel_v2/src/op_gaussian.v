@@ -60,6 +60,7 @@ module op_gaussian #(
             out <= 'h0;
         end else begin
             out <= out_c;
+            $write("%d,%d:   Numerator: %04x    Denominator: %04x    Result: %04x  \n", y, x, num, denom, out_c);
         end
     end
 
@@ -81,6 +82,7 @@ module op_gaussian #(
             end
         end
 
+        //todo: grab a division module
         out_c = num / denom;
         
     end
