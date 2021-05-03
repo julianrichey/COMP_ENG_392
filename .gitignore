@@ -4,7 +4,7 @@
 *.ini
 *.wlf
 
-transcript
-_info
-_vmake
+transcript*
+_info*
+_vmake*
 

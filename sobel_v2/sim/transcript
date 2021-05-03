@@ -6,76 +6,76 @@
 # Modifying modelsim.ini
 # ** Note: (vlog-1901) OptionFile "C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt" not found. Ignored.
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 03:20:48 on May 03,2021
+# Start time: 03:28:03 on May 03,2021
 # vlog -work work ../src/fifo.v 
 # -- Compiling module fifo
 # 
 # Top level modules:
 # 	fifo
-# End time: 03:20:49 on May 03,2021, Elapsed time: 0:00:01
+# End time: 03:28:03 on May 03,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # ** Note: (vlog-1901) OptionFile "C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt" not found. Ignored.
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 03:20:49 on May 03,2021
+# Start time: 03:28:03 on May 03,2021
 # vlog -work work ../src/grayscale.v 
 # -- Compiling module grayscale
 # 
 # Top level modules:
 # 	grayscale
-# End time: 03:20:49 on May 03,2021, Elapsed time: 0:00:00
+# End time: 03:28:03 on May 03,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # ** Note: (vlog-1901) OptionFile "C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt" not found. Ignored.
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 03:20:49 on May 03,2021
+# Start time: 03:28:03 on May 03,2021
 # vlog -work work ../src/op_sobel.v 
 # -- Compiling module op_sobel
 # 
 # Top level modules:
 # 	op_sobel
-# End time: 03:20:49 on May 03,2021, Elapsed time: 0:00:00
+# End time: 03:28:04 on May 03,2021, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0
 # ** Note: (vlog-1901) OptionFile "C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt" not found. Ignored.
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 03:20:49 on May 03,2021
+# Start time: 03:28:04 on May 03,2021
 # vlog -work work ../src/op_gaussian.v 
 # -- Compiling module op_gaussian
 # 
 # Top level modules:
 # 	op_gaussian
-# End time: 03:20:50 on May 03,2021, Elapsed time: 0:00:01
+# End time: 03:28:04 on May 03,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # ** Note: (vlog-1901) OptionFile "C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt" not found. Ignored.
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 03:20:50 on May 03,2021
+# Start time: 03:28:04 on May 03,2021
 # vlog -work work ../src/op_padder.v 
 # -- Compiling module op_padder
 # 
 # Top level modules:
 # 	op_padder
-# End time: 03:20:50 on May 03,2021, Elapsed time: 0:00:00
+# End time: 03:28:04 on May 03,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # ** Note: (vlog-1901) OptionFile "C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt" not found. Ignored.
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 03:20:50 on May 03,2021
+# Start time: 03:28:04 on May 03,2021
 # vlog -work work ../src/dut_system.v 
 # -- Compiling module dut_system
 # 
 # Top level modules:
 # 	dut_system
-# End time: 03:20:50 on May 03,2021, Elapsed time: 0:00:00
+# End time: 03:28:05 on May 03,2021, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0
 # ** Note: (vlog-1901) OptionFile "C:/Users/julia/Documents/GitHub/COMP_ENG_392/sobel_v2/sim/vlog.opt" not found. Ignored.
 # Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 03:20:50 on May 03,2021
+# Start time: 03:28:05 on May 03,2021
 # vlog -work work ../src/testbench.v 
 # -- Compiling module dut_testbench
 # 
 # Top level modules:
 # 	dut_testbench
-# End time: 03:20:51 on May 03,2021, Elapsed time: 0:00:01
+# End time: 03:28:05 on May 03,2021, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # vsim "+notimingchecks" -L work work.dut_testbench -wlf testbench.wlf 
-# Start time: 03:20:51 on May 03,2021
+# Start time: 03:28:05 on May 03,2021
 # Loading work.dut_testbench
 # Loading work.dut_system
 # Loading work.fifo
@@ -85,9 +85,9 @@
 # Loading work.op_sobel
 # ** Warning: (vsim-WLF-5000) WLF file currently in use: testbench.wlf
 #           File in use by: julia  Hostname: LEG-ION  ProcessID: 27984
-#           Attempting to use alternate WLF file "./wlftf2qsda".
+#           Attempting to use alternate WLF file "./wlft8cm44y".
 # ** Warning: (vsim-WLF-5001) Could not open WLF file: testbench.wlf
-#           Using alternate file: ./wlftf2qsda
+#           Using alternate file: ./wlft8cm44y
 # 
 # @ 300: Beginning simulation...
 # @ 300: Loading file             tiny.bmp...
@@ -610,5 +610,5 @@
 #    Time: 228600 ns  Iteration: 2  Instance: /dut_testbench
 # Break in NamedBeginStat tb_process at ../src/testbench.v line 173
 # Stopped at ../src/testbench.v line 173
-# End time: 03:20:53 on May 03,2021, Elapsed time: 0:00:02
+# End time: 03:28:12 on May 03,2021, Elapsed time: 0:00:07
 # Errors: 0, Warnings: 2
