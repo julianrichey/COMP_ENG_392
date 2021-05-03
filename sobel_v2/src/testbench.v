@@ -2,33 +2,32 @@
 
 module dut_testbench();
 
-    localparam integer USE_GAUSSIAN = 1;
+    //dut_system rearranges itself according to these
+    localparam USE_GAUSSIAN = 1'b1;
+    localparam USE_SOBEL = 1'b1;
 
-    //from memory to grayscale
+    //first fifo
     localparam integer RGB_DWIDTH = 8 * 3;
-    localparam integer RGB_BUFFER = 16;
 
-    //from grayscale to gaussian
-    localparam integer GRAYSCALE_DWIDTH = 8;
-    localparam integer GRAYSCALE_BUFFER = 16;
-
-    //from gaussian to sobel
-    localparam integer GAUSSIAN_DWIDTH = 8;
-    localparam integer GAUSSIAN_BUFFER = 16;
-
-    //from sobel to memory
-    localparam integer SOBEL_DWIDTH = 8;
-    localparam integer SOBEL_BUFFER = 16;
+    //all other fifos
+    localparam integer DWIDTH = 8;
+    localparam integer BUFFER = 16;
     
-    parameter [30*8-1:0] fifo_in_name = "tiny_64_32.bmp";
-    parameter [30*8-1:0] fifo_out_name = (USE_GAUSSIAN == 1) ? "tiny_gaussian.bmp" : "tiny_sobel.bmp";
-    localparam integer bmp_width = 64;
-    localparam integer bmp_height = 32;
+    localparam [20*8-1:0] name = "tiny";
+    localparam [20*8-1:0] fifo_in_name = {name,".bmp"};
+    localparam integer IMG_WIDTH = (name == "tiny") ? 64 : 720;
+    localparam integer IMG_HEIGHT = (name == "tiny") ? 32 : 540;
 
-    // parameter [30*8-1:0] fifo_in_name = "copper_720_540.bmp";
-    // parameter [30*8-1:0] fifo_out_name = "copper_sobel.bmp";
-    // localparam integer bmp_width = 720;
-    // localparam integer bmp_height = 540;
+    localparam [60*8-1:0] fifo_out_name = (USE_GAUSSIAN == 1'b0) ?
+                                          ((USE_SOBEL == 1'b0) ? {name,"_grayscale.bmp"} : {name,"_sobel.bmp"}) :
+                                          ((USE_SOBEL == 1'b0) ? {name,"_gaussian.bmp"} : {name,"_gaussian_sobel.bmp"});
+    localparam [60*8-1:0] groundtruth_name = (USE_GAUSSIAN == 1'b0) ?
+                                             ((USE_SOBEL == 1'b0) ? {name,"_grayscale_gt.bmp"} : {name,"_sobel_gt.bmp"}) :
+                                             ((USE_SOBEL == 1'b0) ? {name,"_gaussian_gt.bmp"} : {name,"_gaussian_sobel_gt.bmp"});
+
+
+    // localparam integer IMG_WIDTH = 720;
+    // localparam integer IMG_HEIGHT = 540;
     // parameter [27*8-1:0] fifo_in_name = "brooklyn_bridge_720_540.bmp";
     // parameter [25*8-1:0] fifo_out_name = "brooklyn_bridge_sobel.bmp";
 
@@ -37,7 +36,7 @@ module dut_testbench();
 
     localparam integer bmp_header_size = 54;
     localparam integer bytes_per_pixel = 3;
-    localparam integer bmp_data_size = bmp_width*bmp_height*bytes_per_pixel+87; //between 87 and 88...
+    localparam integer bmp_data_size = IMG_WIDTH*IMG_HEIGHT*bytes_per_pixel+87; //between 87 and 88...
 
     parameter [63:0] clock_period = 100;
 
@@ -50,7 +49,7 @@ module dut_testbench();
     reg fifo_in_wr_en = 1'sh0;
     reg fifo_in_write_done = 1'sh0;
 
-    wire [SOBEL_DWIDTH-1:0] fifo_out_dout;
+    wire [DWIDTH-1:0] fifo_out_dout;
     wire fifo_out_empty;
     reg fifo_out_rd_en = 1'sh0;
     reg fifo_out_read_done = 1'sh0;
@@ -61,9 +60,11 @@ module dut_testbench();
     integer errors = 0;
     integer warnings = 0;
 
-    //literally just to stop modelsim from giving warnings
+    //literally just to make modelsim not give warnings
     integer bytes_read_header;
     integer bytes_read_data;
+    integer bytes_read_header_groundtruth;
+    integer bytes_read_data_groundtruth;
 
     reg [63:0] start_time = 0;
     reg [63:0] end_time = 0;
@@ -73,13 +74,19 @@ module dut_testbench();
     reg [RGB_DWIDTH-1:0] fifo_in_data_write;
     
     integer fifo_out_file;
+    reg [DWIDTH-1:0] fifo_out_data_read = 'h0;
+
+    integer groundtruth_file;
+    reg [RGB_DWIDTH-1:0] groundtruth_data;
+
+
     //integer fifo_out_write_iter = 0;
     //integer tb_fifo_out_file;
-    //integer fifo_out_read_iter = 0;
-    reg [SOBEL_DWIDTH-1:0] fifo_out_data_read = 'h0;
+    integer fifo_out_read_iter = 0;
     //reg [SOBEL_DWIDTH-1:0] fifo_out_data_cmp = 'h0;
 
     reg [7:0] bmp_header [0:bmp_header_size-1];
+    reg [7:0] bmp_header_groundtruth [0:bmp_header_size-1];
 
     /*function [DWIDTH_OUT-1:0] to_01;
         input reg [DWIDTH_OUT-1:0] val;
@@ -101,25 +108,21 @@ module dut_testbench();
 
     dut_system #(
         .USE_GAUSSIAN(USE_GAUSSIAN),
-        .IMG_WIDTH(bmp_width),
-        .IMG_HEIGHT(bmp_height),
+        .USE_SOBEL(USE_SOBEL),
+        .IMG_WIDTH(IMG_WIDTH),
+        .IMG_HEIGHT(IMG_HEIGHT),
         .RGB_DWIDTH(RGB_DWIDTH),
-        .RGB_BUFFER(RGB_BUFFER),
-        .GRAYSCALE_DWIDTH(GRAYSCALE_DWIDTH),
-        .GRAYSCALE_BUFFER(GRAYSCALE_BUFFER),
-        .GAUSSIAN_DWIDTH(GAUSSIAN_DWIDTH),
-        .GAUSSIAN_BUFFER(GAUSSIAN_BUFFER),
-        .SOBEL_DWIDTH(SOBEL_DWIDTH),
-        .SOBEL_BUFFER(SOBEL_BUFFER)
+        .DWIDTH(DWIDTH),
+        .BUFFER(BUFFER)
     ) dut_system_inst (
         .clock(clock),
         .reset(reset),
-        .fifo_rgb_din(fifo_in_din),
-        .fifo_rgb_full(fifo_in_full),
-        .fifo_rgb_wr_en(fifo_in_wr_en),
-        .fifo_sobel_dout(fifo_out_dout),
-        .fifo_sobel_empty(fifo_out_empty),
-        .fifo_sobel_rd_en(fifo_out_rd_en)
+        .fifo_in_din(fifo_in_din),
+        .fifo_in_full(fifo_in_full),
+        .fifo_in_wr_en(fifo_in_wr_en),
+        .fifo_out_dout(fifo_out_dout),
+        .fifo_out_empty(fifo_out_empty),
+        .fifo_out_rd_en(fifo_out_rd_en)
     );
 
     always 
@@ -228,6 +231,9 @@ module dut_testbench();
             $fwrite(fifo_out_file, "%c", bmp_header[k]);
         end
 
+        groundtruth_file = $fopen(groundtruth_name, "rb");
+        bytes_read_header_groundtruth = $fread(bmp_header_groundtruth, groundtruth_file, 0, bmp_header_size);
+
         wait( fifo_out_empty == 1'b0);
         
         for (k=0; k<bmp_data_size; k=k+bytes_per_pixel) begin
@@ -240,53 +246,19 @@ module dut_testbench();
                 fifo_out_rd_en <= 1'b1;
                 fifo_out_data_read = fifo_out_dout;
                 $fwrite(fifo_out_file, "%c%c%c", fifo_out_data_read, fifo_out_data_read, fifo_out_data_read);
-            end
-        end
-        
 
-        /*
-        for (k=0; k<2200; k=k+1) begin
-            $fwrite(fifo_out_file, "%c", 8'hFF);
-        end
-
-        for (k=0; k<1200000; k=k+1) begin
-            $fwrite(fifo_out_file, "%c", 8'h00);
-        end
-        */
-
-
-        /*
-        $write("@ %0t: Loading file %s...\n", $time, fifo_out_name);
-        fifo_out_file = $fopen(fifo_out_name, "r");
-        
-        $write("@ %0t: Writing file %s...\n", $time, tb_fifo_out_name);
-        tb_fifo_out_file = $fopen(tb_fifo_out_name, "w");
-        
-        while ( ! $feof(fifo_out_file) )
-        begin 
-            wait( clock == 1'b1 );
-            wait( clock == 1'b0 );
-            if ( fifo_out_empty == 1'b1 ) begin
-                fifo_out_rd_en <= 1'b0;
-                fifo_out_data_read = 'h0;
-            end
-            else begin
-                fifo_out_rd_en <= 1'b1;
-                fifo_out_data_read = fifo_out_dout;
-            
-                $fwrite(tb_fifo_out_file, "%x\n", fifo_out_data_read);
-                $fscanf(fifo_out_file, "%8x\n", fifo_out_data_cmp);
-                if (to_01(fifo_out_data_read) != to_01(fifo_out_data_cmp)) begin 
-                    fifo_out_errors <= fifo_out_errors + 1;
-                    $write("@ %0t: %s(%0d): ERROR: %x != %x for 'fifo_out'.\n", $time, tb_fifo_out_name, fifo_out_read_iter + 1, fifo_out_data_read, fifo_out_data_cmp);
+                bytes_read_data_groundtruth = $fread(groundtruth_data[23:0], groundtruth_file, bmp_header_size+(k*bytes_per_pixel), bytes_per_pixel);
+                if (groundtruth_data != {3{fifo_out_data_read}}) begin
+                    $write("@ %0t: %s(%0d): ERROR: %x != %x for 'fifo_out'.\n", $time, groundtruth_name, fifo_out_read_iter + 1, {3{fifo_out_data_read}}, groundtruth_data);
+                    errors = errors + 1;
                 end
-                fifo_out_read_iter <= fifo_out_read_iter + 1;
-            end 
+                fifo_out_read_iter = fifo_out_read_iter + 1;
+
+            end
         end
-        */
-        
-        //$fclose(tb_fifo_out_file);
+
         $fclose(fifo_out_file);
+        $fclose(groundtruth_file);
         
         wait( clock == 1'b0 );
         wait( clock == 1'b1 );

@@ -4,29 +4,24 @@ The main goal of this module is to read from and write to fifos every cycle.
 This doesn't matter too much, but was a good time. 
 
 
-
-
-
-
 // 1. figure out current errors
 //     problems with window and shift reg
-2. verify sobel against c output
-    add conditions for edges, make sure padding works
-3. parameterize this to hell, then verify sobel again
-    in, out widths
-    3x3, 5x5, 7x7, 9x9, 11x11 and the padding that has to happen for each
-    instantiate sobel_op only based on a parameter
-4. write a 'gaussian_op'
-    this file should be exact same, just instantiate a different module
-5. verify gaussian against c output
+// 2. verify sobel against c output
+//     add conditions for edges, make sure padding works
+// 3. parameterize this to hell, then verify sobel again
+//     in, out widths
+//     3x3, 5x5, 7x7, 9x9, 11x11 and the padding that has to happen for each
+//     instantiate sobel_op only based on a parameter
+// 4. write a 'gaussian_op'
+//     this file should be exact same, just instantiate a different module
+5. verify gaussian against c output 
+    TODO - sometimes, gaussian rounds incorrectly.
+    when a bad round happens, it happens up when the number is small and down when the number is large
+    what?!?
 6. parameterize stride?!
     might be easy or hard... not sure yet. dont worry about until later
 7. make sure this works in a loop of prologue->image->epilogue to process multiple frames
 
-
-assumptions:
-window is smaller than image
-    if this changes later one, may need to carefully evaluate if/else logic in combinational block
 
 */
 
@@ -95,6 +90,10 @@ module op_padder #(
     reg [DWIDTH_IN-1:0] edge_storage [0:PADDING-1];
     reg [DWIDTH_IN-1:0] edge_storage_c [0:PADDING-1];
 
+    reg [`CLOG2(IMG_WIDTH + WINDOW_SIZE)-1:0] x,x_c;
+    reg [`CLOG2(IMG_HEIGHT + WINDOW_SIZE)-1:0] y,y_c;
+    reg [`CLOG2(IMG_WIDTH + WINDOW_SIZE)-1:0] x_last;
+    reg [`CLOG2(IMG_HEIGHT + WINDOW_SIZE)-1:0] y_last;
     
     reg [(DWIDTH_IN*WINDOW_SIZE*WINDOW_SIZE)-1:0] window;
     integer ii,jj;
@@ -110,10 +109,14 @@ module op_padder #(
     if (OP == SOBEL_OP) begin
         op_sobel #(
             .DWIDTH_IN(DWIDTH_IN*WINDOW_SIZE*WINDOW_SIZE),
-            .DWIDTH_OUT(DWIDTH_OUT)
+            .DWIDTH_OUT(DWIDTH_OUT),
+            .IMG_WIDTH(IMG_WIDTH),
+            .IMG_HEIGHT(IMG_HEIGHT)
         ) op_sobel_0 (
             .clock(clock),
             .reset(reset),
+            .x(x),
+            .y(y),
             .in(window),
             .out(fifo_out_din_c)
         );
@@ -126,18 +129,15 @@ module op_padder #(
         ) op_gaussian_0 (
             .clock(clock),
             .reset(reset),
-            .x(x),
-            .y(y),
+            .x(x_last),
+            .y(y_last),
             .in(window),
             .out(fifo_out_din_c)
         );
+    end else begin
+        //future OPs
     end
 
-
-    reg [`CLOG2(IMG_WIDTH)-1:0] x,x_c;
-    reg [`CLOG2(IMG_HEIGHT)-1:0] y,y_c;
-    reg [`CLOG2(IMG_WIDTH)-1:0] x_last;
-    reg [`CLOG2(IMG_HEIGHT)-1:0] y_last;
     integer iii;
     always @(posedge clock) begin
         if (reset == 1'b1) begin
@@ -169,21 +169,7 @@ module op_padder #(
             for (iii=0; iii<PADDING; iii=iii+1) begin
                 edge_storage[iii] <= edge_storage_c[iii];
             end
-            
-            //testing
-            //this is one way to make the edge rows+cols of sobel black
-            //just use the state of x/y corresponding to data coming out of op_sobel
-            //could manipulate the output of other operations here as well
-            if (OP == SOBEL_OP) begin
-                if (x_last > PADDING+1 && x_last < IMG_WIDTH+PADDING-1 && y_last > PADDING && y_last < IMG_HEIGHT+PADDING-1) begin
-                    fifo_out_din <= fifo_out_din_c;
-                end else begin
-                    fifo_out_din <= 'b0;
-                end
-            end else begin
-                fifo_out_din <= fifo_out_din_c;
-            end
-
+            fifo_out_din <= fifo_out_din_c;
             fifo_out_wr_en_shift_reg[0] <= fifo_out_wr_en_shift_reg_c;
             fifo_out_wr_en_shift_reg[1] <= fifo_out_wr_en_shift_reg[0];
             fifo_out_wr_en <= fifo_out_wr_en_shift_reg[1];
@@ -338,41 +324,28 @@ module op_padder #(
                         for (i=WINDOW_SIZE; i<REG_SIZE; i=i+1) begin
                             shift_reg_c[i] = shift_reg[i-WINDOW_SIZE];
                         end
-                        for (i=PADDING+1; i<WINDOW_SIZE; i=i+i) begin
+
+                        for (i=1; i<WINDOW_SIZE; i=i+i) begin
                             shift_reg_c[i] = 'b0;
                         end
-                        for (i=1; i<PADDING+1; i=i+i) begin
-                            shift_reg_c[i] = edge_storage[i-1];
-                        end
-                        shift_reg_c[0] = fifo_in_dout;
+                        shift_reg_c[0] = 'b0;
 
                         x_c = x + 'b1;
                         y_c = y;
 
-                    end else if (x >= IMG_WIDTH) begin
+                    end else if (x == IMG_WIDTH+PADDING-1) begin
                         for (i=1; i<REG_SIZE; i=i+1) begin
                             shift_reg_c[i] = shift_reg[i-1];
                         end
                         shift_reg_c[0] = 'b0;
 
-                        if (y == IMG_HEIGHT+PADDING-1) begin //done, no more data to write to edge_storage
-                            if (x < IMG_WIDTH+PADDING-1) begin
-                                x_c = x + 'b1;
-                                y_c = y;
-                            end else begin
-                                state_c = TEMP_END_STATE;
-                                x_c = 'b0;
-                                y_c = 'b0;
-                            end
+                        if (y == IMG_HEIGHT+PADDING-1) begin
+                            state_c = TEMP_END_STATE;
+                            x_c = 'b0;
+                            y_c = 'b0;
                         end else begin
-                            edge_storage_c[IMG_WIDTH+PADDING-x-1] = fifo_in_dout;
-                            if (x < IMG_WIDTH+PADDING-1) begin
-                                x_c = x + 'b1;
-                                y_c = y;
-                            end else begin
-                                x_c = PADDING;
-                                y_c = y + 'b1;
-                            end
+                            x_c = PADDING;
+                            y_c = y + 'b1;
                         end
 
                     end else begin
