@@ -14,6 +14,7 @@ module dut_testbench();
     localparam integer BUFFER = 16;
     
     localparam [20*8-1:0] name = "tiny";
+
     localparam [20*8-1:0] fifo_in_name = {name,".bmp"};
     localparam integer IMG_WIDTH = (name == "tiny") ? 64 : 720;
     localparam integer IMG_HEIGHT = (name == "tiny") ? 32 : 540;

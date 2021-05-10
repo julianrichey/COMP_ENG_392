@@ -17,5 +17,5 @@ do wave.do
 
 run -all
 
---quit
+quit
 
