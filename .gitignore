@@ -3,6 +3,8 @@
 *.qtl
 *.ini
 *.wlf
+*.bmp
+*.exe
 
 transcript
 _info
