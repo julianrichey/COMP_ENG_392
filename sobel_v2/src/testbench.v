@@ -246,12 +246,16 @@ module dut_testbench();
             end else begin
                 fifo_out_rd_en <= 1'b1;
                 fifo_out_data_read = fifo_out_dout;
-                $fwrite(fifo_out_file, "%c%c%c", fifo_out_data_read, fifo_out_data_read, fifo_out_data_read);
+                
 
                 bytes_read_data_groundtruth = $fread(groundtruth_data[23:0], groundtruth_file, bmp_header_size+(k*bytes_per_pixel), bytes_per_pixel);
                 if (groundtruth_data != {3{fifo_out_data_read}}) begin
                     $write("@ %0t: %s(%0d): ERROR: %x != %x for 'fifo_out'.\n", $time, groundtruth_name, fifo_out_read_iter + 1, {3{fifo_out_data_read}}, groundtruth_data);
                     errors = errors + 1;
+
+                    $fwrite(fifo_out_file, "%c%c%c", (fifo_out_data_read | 8'hFF), (fifo_out_data_read | 8'hFF), (fifo_out_data_read | 8'hFF)); //24'hFFFFFF);
+                end else begin
+                    $fwrite(fifo_out_file, "%c%c%c", fifo_out_data_read, fifo_out_data_read, fifo_out_data_read);
                 end
                 fifo_out_read_iter = fifo_out_read_iter + 1;
 

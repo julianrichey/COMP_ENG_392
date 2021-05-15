@@ -106,7 +106,7 @@ void gaussian_blur(unsigned char *in_data, int height, int width, unsigned char 
             }
          }
 		 out_data[y*width + x] = numerator_r / denominator;
-       printf("%d,%d:   Numerator: %04x    Denominator: %04x    Result: %04x \n", y,x, numerator_r, denominator, out_data[y*width + x]);
+       printf("%u,%u:   Numerator: %u    Denominator: %u    Result: %u \n", y,x, numerator_r, denominator, out_data[y*width + x]);
       }
    }
 }

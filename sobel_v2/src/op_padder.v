@@ -170,9 +170,18 @@ module op_padder #(
                 edge_storage[iii] <= edge_storage_c[iii];
             end
             fifo_out_din <= fifo_out_din_c;
+
+            //if op == gausian
+            //din <= din_c can probably remain as is?
+            //but wr_en_shift_reg will have to be extended a bunch
+            //by 17 stages? (ie, dividend width)
+
+
             fifo_out_wr_en_shift_reg[0] <= fifo_out_wr_en_shift_reg_c;
             fifo_out_wr_en_shift_reg[1] <= fifo_out_wr_en_shift_reg[0];
             fifo_out_wr_en <= fifo_out_wr_en_shift_reg[1];
+
+            
         end
     end
 

@@ -30,7 +30,7 @@ module op_gaussian #(
 );
     localparam [7:0] gauss_op [0:24] = '{8'h02, 8'h04, 8'h05, 8'h04, 8'h02, 
                                          8'h04, 8'h09, 8'h0C, 8'h09, 8'h04, 
-                                         8'h05, 8'h0C, 8'h0E, 8'h0C, 8'h05, 
+                                         8'h05, 8'h0C, 8'h0F, 8'h0C, 8'h05, 
                                          8'h04, 8'h09, 8'h0C, 8'h09, 8'h04, 
                                          8'h02, 8'h04, 8'h05, 8'h04, 8'h02};
 
@@ -42,7 +42,10 @@ module op_gaussian #(
     //                        2*0b11111111 + 4*0b11111111 + 5*0b11111111 + 4*0b11111111 + 2*0b11111111
     //num is good at 16 bits because >0
 
-    reg [15:0] num, denom;
+    //max denominator = 0b10011111, denom is good at 8 bits
+
+    reg [16:0] num; //17 bits for sign bit bc pipelined_divider takes in signed numerator oops
+    reg [7:0] denom;
     reg [DWIDTH_OUT-1:0] out_c;
 
     reg [7:0] data [0:DWIDTH_IN/8-1];
@@ -60,7 +63,10 @@ module op_gaussian #(
             out <= 'h0;
         end else begin
             out <= out_c;
-            $write("%d,%d:   Numerator: %04x    Denominator: %04x    Result: %04x  \n", y, x, num, denom, out_c);
+            //04x
+            //pg 279- format specifications
+            //u in verilog refers to something else
+            $write("%d,%d:   Numerator: %d    Denominator: %d    Result: %d  \n", y-2, x-2, num, denom, out_c);
         end
     end
 
@@ -71,12 +77,12 @@ module op_gaussian #(
         for (j=0; j<5; j=j+1) begin
             for (i=0; i<5; i=i+1) begin
                 if (
-                    x >= 2 + i &&
-                    x < IMG_WIDTH + i &&
-                    y >= 2 + j &&
-                    y < IMG_HEIGHT + j
+                    x + i >= 4 &&
+                    x + i < IMG_WIDTH + 4 &&
+                    y + j >= 4 &&
+                    y + j < IMG_HEIGHT + 4
                 ) begin
-                    num = num + ({8'h00,data[(j)*5 + (i)]} * {8'h00,gauss_op[(i)*5 + (j)]});
+                    num = num + ({8'h00,data[(4-j)*5 + (4-i)]} * {8'h00,gauss_op[(i)*5 + (j)]});
                     denom = denom + {8'h00,gauss_op[(i)*5 + (j)]};
                 end
             end
@@ -86,4 +92,19 @@ module op_gaussian #(
         out_c = num / denom;
         
     end
+
+    // pipelined_divider #( //Divides signed dividend by unsigned divisor
+    //     .dividend_width(17),
+    //     .divisor_width(8),
+    //     .round(1'b0)
+    // ) pipelined_divider_0 (
+    //     .clock(clock), //todo: add reset
+    //     .input_valid(1'b1), //here, just do it every cycle. op_padder
+    //     .dividend(num),
+    //     .divisor(denom),
+    //     .output_valid(),
+    //     .quotient(),
+    //     .remainder()
+    // );
+
 endmodule
