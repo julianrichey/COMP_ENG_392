@@ -66,7 +66,7 @@ module op_gaussian #(
             //04x
             //pg 279- format specifications
             //u in verilog refers to something else
-            $write("%d,%d:   Numerator: %d    Denominator: %d    Result: %d  \n", y-2, x-2, num, denom, out_c);
+            //$write("%d,%d:   Numerator: %d    Denominator: %d    Result: %d  \n", y-2, x-2, num, denom, out_c);
         end
     end
 
