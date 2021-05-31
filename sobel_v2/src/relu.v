@@ -1,27 +1,26 @@
 `timescale 1 ns / 1 ns
 
 module relu #(
-    parameter integer DWIDTH_IN,
-    parameter integer DWIDTH_OUT
+    parameter integer DWIDTH
 ) (
     input clock,
     input reset,
 
     output reg fifo_in_rd_en,
     //HERE: Assume that data we pass into RELU is signed
-    input signed [DWIDTH_IN-1:0] fifo_in_dout,
+    input signed [DWIDTH-1:0] fifo_in_dout,
     input fifo_in_empty,
 
     output reg fifo_out_wr_en, 
-    output reg signed [DWIDTH_OUT-1:0] fifo_out_din, 
+    output reg signed [DWIDTH-1:0] fifo_out_din, 
     input fifo_out_full
 );
-    reg [DWIDTH_OUT-1:0] fifo_out_din_c;
+    reg [DWIDTH-1:0] fifo_out_din_c;
     reg fifo_out_wr_en_c;
 
 //assume that data is in 2's complement
-    function signed [7:0] RELU;
-        input signed[7:0] vals;
+    function signed [DWIDTH-1:0] RELU;
+        input signed[DWIDTH-1:0] vals;
         //reg [7:0] sum;
         begin
 
