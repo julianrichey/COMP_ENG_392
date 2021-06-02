@@ -1,0 +1,20 @@
+Fitter Status : Successful - Tue Jun 01 23:19:50 2021
+Quartus Prime Version : 20.1.0 Build 711 06/05/2020 SJ Lite Edition
+Revision Name : DE10_NANO_D8M_RTL
+Top-level Entity Name : DE10_NANO_D8M_RTL
+Family : Cyclone V
+Device : 5CSEBA6U23I7
+Timing Models : Final
+Logic utilization (in ALMs) : 2,005 / 41,910 ( 5 % )
+Total registers : 1755
+Total pins : 74 / 314 ( 24 % )
+Total virtual pins : 0
+Total block memory bits : 3,133,440 / 5,662,720 ( 55 % )
+Total RAM Blocks : 381 / 553 ( 69 % )
+Total DSP Blocks : 2 / 112 ( 2 % )
+Total HSSI RX PCSs : 0
+Total HSSI PMA RX Deserializers : 0
+Total HSSI TX PCSs : 0
+Total HSSI PMA TX Serializers : 0
+Total PLLs : 2 / 6 ( 33 % )
+Total DLLs : 0 / 4 ( 0 % )

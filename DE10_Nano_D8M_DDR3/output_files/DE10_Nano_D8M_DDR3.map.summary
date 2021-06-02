@@ -1,0 +1,17 @@
+Analysis & Synthesis Status : Successful - Thu Jan 18 15:14:36 2018
+Quartus Prime Version : 16.0.2 Build 222 07/20/2016 SJ Standard Edition
+Revision Name : DE10_Nano_D8M_DDR3
+Top-level Entity Name : DE10_Nano_D8M_DDR3
+Family : Cyclone V
+Logic utilization (in ALMs) : N/A
+Total registers : 5726
+Total pins : 215
+Total virtual pins : 0
+Total block memory bits : 511,502
+Total DSP Blocks : 4
+Total HSSI RX PCSs : 0
+Total HSSI PMA RX Deserializers : 0
+Total HSSI TX PCSs : 0
+Total HSSI PMA TX Serializers : 0
+Total PLLs : 2
+Total DLLs : 1
