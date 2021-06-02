@@ -44,7 +44,7 @@ module op_gaussian #(
 
     //max denominator = 0b10011111, denom is good at 8 bits
 
-    reg [16:0] num; //17 bits for sign bit bc pipelined_divider takes in signed numerator oops
+    reg [15:0] num;
     reg [7:0] denom;
     reg [DWIDTH_OUT-1:0] out_c;
 
@@ -88,23 +88,34 @@ module op_gaussian #(
             end
         end
 
-        //todo: grab a division module
-        out_c = num / denom;
-        
+        //
+        //out_c = num / denom;    
     end
 
-    // pipelined_divider #( //Divides signed dividend by unsigned divisor
-    //     .dividend_width(17),
-    //     .divisor_width(8),
-    //     .round(1'b0)
-    // ) pipelined_divider_0 (
-    //     .clock(clock), //todo: add reset
-    //     .input_valid(1'b1), //here, just do it every cycle. op_padder
-    //     .dividend(num),
-    //     .divisor(denom),
-    //     .output_valid(),
-    //     .quotient(),
-    //     .remainder()
-    // );
+    wire [16:0] num_extend;
+    assign num_extend = {1'b0, num};
+
+    wire reset_n;
+    assign reset_n = ~reset;
+
+    wire output_valid;
+    wire [16:0] remainder_extend;
+    wire [16:0] quotient_extend;
+    assign out_c = quotient_extend[7:0];
+
+    pipelined_divider #( //Divides signed dividend by unsigned divisor
+        .dividend_width(17), //dividend width is ~ the # cycles for a division to happen
+        .divisor_width(8),
+        .round(1'b0)
+    ) pipelined_divider_0 (
+        .clock(clock),
+        .reset(reset),
+        .input_valid(reset_n), //assume that there is valid input any non-reset cycle
+        .dividend(num_extend),
+        .divisor(denom),
+        .output_valid(output_valid), //should probably use this? but instead just count cycles
+        .quotient(quotient_extend),
+        .remainder(remainder_extend)
+    );
 
 endmodule

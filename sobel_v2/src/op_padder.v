@@ -14,13 +14,13 @@ This doesn't matter too much, but was a good time.
 //     instantiate sobel_op only based on a parameter
 // 4. write a 'gaussian_op'
 //     this file should be exact same, just instantiate a different module
-5. verify gaussian against c output 
-    TODO - sometimes, gaussian rounds incorrectly.
-    when a bad round happens, it happens up when the number is small and down when the number is large
-    what?!?
-6. parameterize stride?!
+// 5. verify gaussian against c output 
+//     TODO - sometimes, gaussian rounds incorrectly.
+//     when a bad round happens, it happens up when the number is small and down when the number is large
+6. use a real divider module for gaussian (and softmax), requires a delay
+7. parameterize stride?!
     might be easy or hard... not sure yet. dont worry about until later
-7. make sure this works in a loop of prologue->image->epilogue to process multiple frames
+8. make sure this works in a loop of prologue->image->epilogue to process multiple frames
 
 
 */
@@ -69,7 +69,8 @@ module op_padder #(
 );
     wire [DWIDTH_OUT-1:0] fifo_out_din_c;
     reg fifo_out_wr_en_shift_reg_c;
-    reg [1:0] fifo_out_wr_en_shift_reg;
+    localparam integer fifo_out_wr_en_shift_reg_size = 21;
+    reg [fifo_out_wr_en_shift_reg_size-1:0] fifo_out_wr_en_shift_reg; //temporarily 20. must be as wide as the cycles taken by the longest operation
 
     localparam integer GAUSSIAN_OP = 0;
     localparam integer SOBEL_OP = 1;
@@ -171,17 +172,18 @@ module op_padder #(
             end
             fifo_out_din <= fifo_out_din_c;
 
-            //if op == gausian
-            //din <= din_c can probably remain as is?
-            //but wr_en_shift_reg will have to be extended a bunch
-            //by 17 stages? (ie, dividend width)
-
-
             fifo_out_wr_en_shift_reg[0] <= fifo_out_wr_en_shift_reg_c;
-            fifo_out_wr_en_shift_reg[1] <= fifo_out_wr_en_shift_reg[0];
-            fifo_out_wr_en <= fifo_out_wr_en_shift_reg[1];
+            for (iii=0; iii<fifo_out_wr_en_shift_reg_size-1; iii=iii+1) begin
+                fifo_out_wr_en_shift_reg[iii+1] <= fifo_out_wr_en_shift_reg[iii];
+            end
 
-            
+            if (OP == GAUSSIAN_OP) begin
+                fifo_out_wr_en <= fifo_out_wr_en_shift_reg[20];
+            end else if (OP == SOBEL_OP) begin
+                fifo_out_wr_en <= fifo_out_wr_en_shift_reg[1];
+            end else begin
+                fifo_out_wr_en <= fifo_out_wr_en_shift_reg[1]; //default
+            end
         end
     end
 
